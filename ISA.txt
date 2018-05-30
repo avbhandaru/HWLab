@@ -1,0 +1,106 @@
+## Instructions we will implement Fully ##
+
+ADD (immediate) 
+	11110 i 0 1000 S Rn 0 imm3 Rd imm8
+	11110 i 1 0000 0 Rn 0 imm3 Rd imm8
+ADD (register)
+	11101 01 1000 S Rn (0) imm3 Rd imm2 type Rm
+ADD (SP plus immediate)
+	11110 i 0 1000 S 1101 0 imm3 Rd imm8
+	11110 i 1 0000 0 1101 0 imm3 Rd imm8
+ADD (SP plus register)
+	11101011000 S 1101 0 imm3 Rd imm2 type Rm
+AND (immediate)
+	11110 i 0 0000 S Rn 0 imm3 Rd imm8
+AND (register) 
+	11101 01 0000 S Rn (0) imm3 Rd imm2 type Rm
+ASR (immediate arithmetic right shift)
+	11101 01 0010 S 1111 (0) imm3 Rd imm2 10 Rm
+ASR (register)
+	11111 010 0 10 S Rn 1111 Rd 0 000 Rm
+B (branch)
+	11110 S cold imm6 10 J1 0 J2 imm11
+	11110 S imm10 10 J1 1 J2 imm11
+BL (branch with link)
+	11110 S imm10 11 J1 1 J2 imm11
+CLZ (count leading zeros)
+	11111 010 1 011 Rm 1111 Rd 1 000 Rm
+CMN (compare negative immediate)
+	11110 i 0 1000 1 Rn 0 imm3 1111 imm8
+CMP (compare immediate)
+	11110 i 0 1101 1 Rn 0 imm3 1111 imm8
+CMP (register)
+	11101 01 1101 1 Rn (0) imm3 1111 imm2 type Rm
+EOR (immediate)
+	11110 i 0 0100 S Rn 0 imm3 Rd imm8
+EOR (register)
+	11101 01 0100 S Rn (0) imm3 Rd imm2 type Rm
+LDR (load register immediate)
+	11111 00 0 1 10 1 Rn Rt imm12
+	11111 00 0 0 10 1 Rn Rt 1 PUW imm8
+LDR (register)
+	11111 00 0 0 10 1 Rn Rt 0 00000 imm2 Rm
+LDRB (load register byte immediate)
+	11111 00 0 1 00 1 Rn Rt imm12
+	11111 00 0 0 00 1 Rn Rt 1 PUW imm8
+LDRB (register)
+	11111 00 0 0 00 1 Rn Rt 0 00000 imm2 Rm
+LDRSB (load register signed byte immediate)
+	11111 00 1 1 00 1 Rn Rt imm12
+	11111 00 1 0 00 1 Rn Rt 1 PUW imm8
+LDRSB (register)
+	11111 00 1 0 00 1 Rn Rt 0 00000 imm2 Rm
+LSL (immediate)
+	11101 01 0010 S 1111 (0) imm3 Rd imm2 00 Rm
+LSL (register)
+	11111 010 0 00 S Rn 1111 Rd 0 000 Rm
+LSR (immediate)
+	11101 01 0010 S 1111 (0) imm3 Rd imm2 01 Rm
+LSR (register)
+	11111 010 0 01 S Rn 1111 Rd 0 000 Rm
+MLA (Multiply Accumulate) - extra credit
+	11111 0110 000 Rn Ra Rd 0000 Rm
+MLS (subtract) - extra credit
+	11111 0110 000 Rn Ra Rd 0001 Rm
+MOV (immediate)
+	11110 i 0 0010 S 1111 0 imm3 Rd imm8
+	11110 i 10 0 1 0 0 imm4 0 imm3 Rd imm8
+MOV (register)
+	11101 01 0010 S 1111 (0) 000 Rd 0000 Rm
+MRS
+
+MSR
+
+MUL - extra credit
+
+MVN (immediate)
+
+MVN (move not register)
+
+NOP
+	11110 0 111 01 0 (1)(1)(1)(1) 10 (0) 0 (0) 000 00000000
+ORN
+
+ORR
+
+PLI (preload instruction hint)?
+
+RBIT (reverse bits)
+
+REV (byte reverse)
+
+SBC (subtract with carry)
+
+STR (stores)
+
+STRB (byte store)
+
+SUB
+
+TEQ (test equivalence)
+
+TST
+
+
+	
+
