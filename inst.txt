@@ -4,38 +4,88 @@ Cond: Has to do with conditionals
 F: Instruction format
 I: Immediate flag
 Op: Opcode
-S: Has to do with conditionals
+S: Set conditional flags
+ST = Shift Type (00 = LSL, 01 = LSR, 10 = ASR, 11 = RSR)
 
-DP Format: INST rd, rn
-
-
-
-
+DP (Binary) Format: INST rd, rm, rn
+DP (Unary) Format: INST rd, rm 	  		# with rn = 0
 
 
-Data Processing 
+Data Processing:
 xxxx xx x xxxx x xxxx xxxx xxxxxxxxxxxx
 Cond F  I  Op  S  rn   rd    Operand2
+
+
+Operand2 for Register Shifts (bits 11 to 0):
+xxxx 0 xx 1 xxxx
+rsft   ST I  rm
+
+Operand2 for Immediate Shifts (bits 11 to 0):
+xxxxx xx 0 xxxx
+shift ST I  rm
+
 
 Data Transfer:
 xxxx xx  xxxxxx  xxxx xxxx xxxxxxxxxxxx
 Cond F     Op     rn   rd    Offset12
 
+Branch (Add bits 31-24 of PC to address):
+xxxx 1100 xxxxxxxxxxxxxxxxxxxxxxxx
+Cond  12          address
 
+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 
+Comparison Ops:
+The arithmetic operations (SUB, RSB, ADD, ADC, SBC, RSC, CMP, CMN) treat each
+operand as a 32 bit integer (either unsigned or 2’s complement signed, the two are
+equivalent). 
 
+If the S bit is set (and Rd is not R15) 
+	• the V (overflow) flag in the CPSR will be set if an overflow occurs into bit 31 of the result; this may be ignored if the operands were considered unsigned, but warns of a possible error if the operands were 2’s complement signed. 
+	• the C (carry) flag will be set to the carry out of bit 31 of the ALU. 
+	• the Z (zero) flag will be set if and only if the result was zero.
+	• the N (negative) flag will be set to the value of bit 31 of the result (indicating a negative result if the operands are considered to be 2’s complement signed)
 
+AND 	0000 	operand1 AND operand2
+EOR 	0001 	operand1 EOR operand2
+SUB 	0010 	operand1 - operand2
+RSB 	0011 	operand2 - operand1
+ADD 	0100 	operand1 + operand2
+ADC 	0101 	operand1 + operand2 + carry
+SBC 	0110 	operand1 - operand2 + carry - 1
+RSC	0111 	operand2 - operand1 + carry - 1
+TST 	1000 	as AND, but result is not written
+TEQ	1001 	as EOR, but result is not written
+CMP 	1010 	as SUB, but result is not written
+CMN 	1011 	as ADD, but result is not written
+ORR 	1100 	operand1 OR operand2
+MOV 	1101 	operand2(operand1 is ignored)
+BIC 	1110 	operand1 AND NOT operand2(Bit clear)
+MVN 	1111 	NOT operand2(operand1 is ignored)
 
-
-
-
-
-J-Type:
-xxxx xxxx xxxxxxxxxxxxxxxxxxxxxxxx
-opx  op   immediate
+CPSR Register (First four comparison bits are the important ones):
+x x x x xxxxxxxxxxxxxxxxxxxx x x x x  x  x  x  x
+N Z C V                      I F T M4 M3 M2 M1 M0
 
 Cond layout:
-0 EQ (EQual) 					8 HI (unsigned HIgher)1 NE (Not Equal) 				9 LS (unsigned Lower or Same)2 HS (unsigned Higher or Same) 			10 GE (signed Greater than or Equal)3 LO (unsigned LOwer) 				11 LT (signed Less Than)4 MI (MInus, <0) 				12 GT (signed Greater Than)5 PL - (PLus, >=0) 				13 LE (signed Less Than or Equal)6 VS (oVerfl ow Set, overfl ow)			14 AL (Always)7 VC (oVerfl ow Clear, no overfl ow) 		15 NV (reserved)
+0 EQ (EQual) 					8 HI (unsigned HIgher)1 NE (Not Equal) 				9 LS (unsigned Lower or Same)2 HS (unsigned Higher or Same) 			10 GE (signed Greater than or Equal)3 LO (unsigned LOwer) 				11 LT (signed Less Than)4 MI (MInus, <0) 				12 GT (signed Greater Than)5 PL - (PLus, >=0) 				13 LE (signed Less Than or Equal)6 VS (oVerflow Set, overflow)			14 AL (Always)7 VC (oVerflow Clear, no overflow) 		15 NV (reserved)
+
+
+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+
+
+
+ARM Register Conventions:
+Name	 #	Usage					Preserved On Call
+a1-a2	0-1	Argument / Return / Scratch register	No
+a3-a4	2-3	Argument / Scratch register		No
+v1-v8	4-11	Variables for local routine		Yes
+ip	12	Intra-procedure-call scratch register	No
+sp	13	Stack pointer				Yes
+lr	14	Link register				Yes
+pc	15	Program Counter				n/a
+
+
 
 OP bit layout:
 xx x xxxx x
@@ -48,4 +98,5 @@ OP = Refers to actual operation
 S = Set Conditional Flag
 
 OP codes:
+
 
