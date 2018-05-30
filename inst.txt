@@ -1,0 +1,30 @@
+These are the "instructions :: ops/op code :: general format" of arm instructions:
+
+
+R-Type:
+xxxx xxxxxxxx xxxx xxxx xxxxxxxx xxxx
+opx  op       rs   rd   opx      rt
+
+I-Type:
+xxxx xxxxxxxx xxxx xxxx xxxxxxxxxxxx
+opx  op       rs   rd   immediate
+
+J-Type:
+xxxx xxxx xxxxxxxxxxxxxxxxxxxxxxxx
+opx  op   immediate
+
+OPX layout:
+0 EQ (EQual) 					8 HI (unsigned HIgher)1 NE (Not Equal) 				9 LS (unsigned Lower or Same)2 HS (unsigned Higher or Same) 			10 GE (signed Greater than or Equal)3 LO (unsigned LOwer) 				11 LT (signed Less Than)4 MI (MInus, <0) 				12 GT (signed Greater Than)5 PL - (PLus, >=0) 				13 LE (signed Less Than or Equal)6 VS (oVerfl ow Set, overfl ow)			14 AL (Always)7 VC (oVerfl ow Clear, no overfl ow) 		15 NV (reserved)
+
+OP bit layout:
+xx x xxxx x
+F  I OP   S
+
+Flags:
+F = Instruction Format
+I = Immediate Type
+OP = Refers to actual operation
+S = Set Conditional Flag
+
+OP codes:
+
