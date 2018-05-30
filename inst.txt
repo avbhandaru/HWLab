@@ -1,7 +1,7 @@
 These are the "instructions :: ops/op code :: general format" of arm instructions:
 
 
-R-Type:
+R-Type: DP = Data Processing 
 xxxx xxxxxxxx xxxx xxxx xxxxxxxx xxxx
 opx  op       rs   rd   opx      rt
 
