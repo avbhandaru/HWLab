@@ -1,19 +1,40 @@
 These are the "instructions :: ops/op code :: general format" of arm instructions:
 
+Cond: Has to do with conditionals
+F: Instruction format
+I: Immediate flag
+Op: Opcode
+S: Has to do with conditionals
 
-R-Type: DP = Data Processing 
-xxxx xxxxxxxx xxxx xxxx xxxxxxxx xxxx
-opx  op       rs   rd   opx      rt
+DP Format: INST rd, rn
 
-I-Type:
-xxxx xxxxxxxx xxxx xxxx xxxxxxxxxxxx
-opx  op       rs   rd   immediate
+
+
+
+
+
+Data Processing 
+xxxx xx x xxxx x xxxx xxxx xxxxxxxxxxxx
+Cond F  I  Op  S  rn   rd    Operand2
+
+Data Transfer:
+xxxx xx  xxxxxx  xxxx xxxx xxxxxxxxxxxx
+Cond F     Op     rn   rd    Offset12
+
+
+
+
+
+
+
+
+
 
 J-Type:
 xxxx xxxx xxxxxxxxxxxxxxxxxxxxxxxx
 opx  op   immediate
 
-OPX layout:
+Cond layout:
 0 EQ (EQual) 					8 HI (unsigned HIgher)1 NE (Not Equal) 				9 LS (unsigned Lower or Same)2 HS (unsigned Higher or Same) 			10 GE (signed Greater than or Equal)3 LO (unsigned LOwer) 				11 LT (signed Less Than)4 MI (MInus, <0) 				12 GT (signed Greater Than)5 PL - (PLus, >=0) 				13 LE (signed Less Than or Equal)6 VS (oVerfl ow Set, overfl ow)			14 AL (Always)7 VC (oVerfl ow Clear, no overfl ow) 		15 NV (reserved)
 
 OP bit layout:
