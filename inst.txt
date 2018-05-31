@@ -68,7 +68,7 @@ x x x x xxxxxxxxxxxxxxxxxxxx x x x x  x  x  x  x
 N Z C V                      I F T M4 M3 M2 M1 M0
 
 Cond layout:
-0 EQ (EQual) 					8 HI (unsigned HIgher)1 NE (Not Equal) 				9 LS (unsigned Lower or Same)2 HS (unsigned Higher or Same) 			10 GE (signed Greater than or Equal)3 LO (unsigned LOwer) 				11 LT (signed Less Than)4 MI (MInus, <0) 				12 GT (signed Greater Than)5 PL - (PLus, >=0) 				13 LE (signed Less Than or Equal)6 VS (oVerflow Set, overflow)			14 AL (Always)7 VC (oVerflow Clear, no overflow) 		15 NV (reserved)
+x1xx	0 EQ (EQual) 				x01x		8 HI (unsigned HIgher)x0xx	1 NE (Not Equal) 			xx0x|x1xx	9 LS (unsigned Lower or Same)xx1x	2 HS (unsigned Higher or Same) 		1xx1|0xx0	10 GE (signed Greater than or Equal)xx0x	3 LO (unsigned LOwer) 			1xx0|0xx1	11 LT (signed Less Than)1xxx	4 MI (MInus, <0) 			10x1|00x0	12 GT (signed Greater Than)0xxx	5 PL - (PLus, >=0) 			01x1|11x0	13 LE (signed Less Than or Equal)xxx1	6 VS (oVerflow Set, overflow)		xxxx		14 AL (Always)xxx0	7 VC (oVerflow Clear, no overflow) 	None		15 NV (reserved)
 
 
 –––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
