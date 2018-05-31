@@ -8,31 +8,41 @@
 \f0\fs24 \cf0 ## Instructions we will implement Fully ##\
 \
 
-\fs32 Instruction			Meaning					Op Code\
+\fs32 Instruction			Meaning					xxxx Format x Op Code x (Operand 2 should be 00000 00 0 rm if you don't want to shift)\
 
-\b\fs24 Data Processing:
-\b0 \
-ADD(s)				Add\
-ADC(s)				Add with Carry\
-AND(s)				And\
+\b\fs24 Data Processing:			\ul General Format\ulnone 				
+\b0 xxxx 00 x 
+\b xxxx
+\b0  x xxxx xxxx - Operand 2(12b)\
+ADD(s)				Add						xxxx 00 x 0100  x\
+ADC(s)				Add with Carry				xxxx 00 x 0101 x\
+AND(s)				And						xxxx 00 x 0000 x\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
-\cf0 CLZ					Count Leading Zeros\
-SUB(s)				Subtract\
-RSB(s)				Reverse Subtract Byte\
-SBC(s)				Subtract with Carry\
-RSC(s)				Reverse Subtract with Carry\
-BIC(s)					Bit Clear\
-MOV(s)				Move\
-MVN(s)				Move Not\
-NOP					No Operation\
-ORR(s)				Or\
-RBIT					Reverse Bits\
-REV					Reverse\
-EOR(s)				Exclusive Or\
+\cf0 SUB(s)				Subtract					xxxx 00 x 0010 x\
+RSB(s)				Reverse Subtract Byte			xxxx 00 x 0011 x\
+SBC(s)				Subtract with Carry				xxxx 00 x 0110 x\
+RSC(s)				Reverse Subtract with Carry		xxxx 00 x 0111 x\
+BIC(s)					Bit Clear					xxxx 00 x 1110 x\
+MOV(s)				Move						xxxx 00 x 1101 x\
+MVN(s)				Move Not					xxxx 00 x 1111 x\
+ORR(s)				Or						xxxx 00 x 1100 x\
+EOR(s)				Exclusive Or					xxxx 00 x 0001 x\
 \
-ASR					Arithmetic Right Shift\
-LSL					Logical Shift Left\
-LSR					Logical Shift Right\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\b \cf0 Comparisons:
+\b0 \
+CMN(s)				Compare Not					xxxx 00 x 1011 x\
+CMP(s)				Compare					xxxx 00 x 1010 x\
+TEQ(s)				Test Equals					xxxx 00 x 1001 x\
+TST(s)				Test						xxxx 00 x 1000 x\
+\
+
+\b Shifts: 										
+\b0 (simple shifts will be done with mov)\
+ASR					Arithmetic Right Shift			xxxx 00 x xxxx x xxxx xxxx - xxxx x 10 i xxxx \
+LSL					Logical Shift Left				xxxx 00 x xxxx x xxxx xxxx - xxxx x 00 i xxxx\
+LSR					Logical Shift Right				xxxx 00 x xxxx x xxxx xxxx - xxxx x 01 i xxxx\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 \cf0 \
 
@@ -40,24 +50,31 @@ LSR					Logical Shift Right\
 \b0 \
 B					Branch\
 BL					Branch with Link\
+BX					Branch Exchange\
+BLX					Branch with Link Exchange\
 \
 
-\b Comparisons:
-\b0 \
-CMN(s)				Compare Not\
-CMP(s)				Compare\
-TEQ(s)				Test Equals\
-TST(s)				Test\
-\
-
-\b Data Transfers:
-\b0 \
+\b Data Transfers:									
+\b0 xxxx xx 
+\b xxxxxx
+\b0  xxxx xxxx - xxxxxxxxxxxx\
 LDR					Load Register\
 LDRB					Load Register Byte\
 LDRSB				Load Register Signed Byte\
 STR					Store\
 STRB					Store Byte\
 \
+
+\b General:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\b0 \cf0 NOP					No Operation\
+CLZ					Count Leading Zeros\
+RBIT					Reverse Bits\
+REV					Reverse			\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
 
 \b Extra Credit:
 \b0 \
