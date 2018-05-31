@@ -135,14 +135,14 @@ end TCL_Generic;
     <a name="clabelfont" val="SansSerif bold 16"/>
     <a name="circuitnamedbox" val="true"/>
     <a name="circuitvhdlpath" val=""/>
-    <comp loc="(440,240)" name="DE"/>
     <comp loc="(380,290)" name="Decode"/>
-    <comp loc="(310,240)" name="FD"/>
-    <comp loc="(250,290)" name="Fetch"/>
-    <comp loc="(510,290)" name="Execute"/>
-    <comp loc="(580,240)" name="EM"/>
-    <comp loc="(700,240)" name="MW"/>
     <comp loc="(640,290)" name="Memory"/>
+    <comp loc="(700,240)" name="MW"/>
+    <comp loc="(310,240)" name="FD"/>
+    <comp loc="(440,240)" name="DE"/>
+    <comp loc="(250,290)" name="Fetch"/>
+    <comp loc="(580,240)" name="EM"/>
+    <comp loc="(510,290)" name="Execute"/>
   </circuit>
   <circuit name="Fetch">
     <a name="circuit" val="Fetch"/>
@@ -151,6 +151,134 @@ end TCL_Generic;
     <a name="clabelfont" val="SansSerif bold 16"/>
     <a name="circuitnamedbox" val="true"/>
     <a name="circuitvhdlpath" val=""/>
+    <wire from="(190,410)" to="(220,410)"/>
+    <wire from="(120,130)" to="(150,130)"/>
+    <wire from="(190,200)" to="(200,200)"/>
+    <wire from="(170,390)" to="(230,390)"/>
+    <wire from="(170,340)" to="(240,340)"/>
+    <wire from="(190,440)" to="(230,440)"/>
+    <wire from="(190,370)" to="(210,370)"/>
+    <wire from="(190,320)" to="(210,320)"/>
+    <wire from="(190,280)" to="(210,280)"/>
+    <comp lib="8" loc="(132,319)" name="Text">
+      <a name="text" val="rn"/>
+      <a name="font" val="SansSerif plain 12"/>
+    </comp>
+    <comp lib="0" loc="(190,200)" name="Splitter">
+      <a name="facing" val="west"/>
+      <a name="fanout" val="12"/>
+      <a name="incoming" val="12"/>
+      <a name="appear" val="center"/>
+    </comp>
+    <comp lib="0" loc="(210,320)" name="Tunnel">
+      <a name="width" val="4"/>
+      <a name="label" val="InputReg"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="0" loc="(150,130)" name="Splitter">
+      <a name="fanout" val="32"/>
+      <a name="incoming" val="32"/>
+      <a name="appear" val="right"/>
+    </comp>
+    <comp lib="0" loc="(240,340)" name="Tunnel">
+      <a name="label" val="SCF"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="0" loc="(210,280)" name="Tunnel">
+      <a name="width" val="4"/>
+      <a name="label" val="DestReg"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="8" loc="(117,439)" name="Text">
+      <a name="text" val="conditional"/>
+      <a name="font" val="SansSerif plain 12"/>
+    </comp>
+    <comp lib="0" loc="(220,410)" name="Tunnel">
+      <a name="width" val="2"/>
+      <a name="label" val="Format"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="0" loc="(190,440)" name="Splitter">
+      <a name="facing" val="west"/>
+      <a name="fanout" val="4"/>
+      <a name="incoming" val="4"/>
+      <a name="appear" val="center"/>
+    </comp>
+    <comp lib="0" loc="(120,130)" name="Pin">
+      <a name="width" val="32"/>
+      <a name="label" val="Inst"/>
+    </comp>
+    <comp lib="0" loc="(190,370)" name="Splitter">
+      <a name="facing" val="west"/>
+      <a name="fanout" val="4"/>
+      <a name="incoming" val="4"/>
+      <a name="appear" val="center"/>
+    </comp>
+    <comp lib="0" loc="(230,440)" name="Tunnel">
+      <a name="width" val="4"/>
+      <a name="label" val="Cond"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="0" loc="(190,410)" name="Splitter">
+      <a name="facing" val="west"/>
+      <a name="appear" val="center"/>
+    </comp>
+    <comp lib="0" loc="(230,390)" name="Tunnel">
+      <a name="label" val="Imm"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="0" loc="(190,280)" name="Splitter">
+      <a name="facing" val="west"/>
+      <a name="fanout" val="4"/>
+      <a name="incoming" val="4"/>
+      <a name="appear" val="center"/>
+    </comp>
+    <comp lib="8" loc="(117,391)" name="Text">
+      <a name="text" val="immediate"/>
+      <a name="font" val="SansSerif plain 12"/>
+    </comp>
+    <comp lib="8" loc="(116,203)" name="Text">
+      <a name="text" val="operand 2"/>
+      <a name="font" val="SansSerif plain 12"/>
+    </comp>
+    <comp lib="0" loc="(190,320)" name="Splitter">
+      <a name="facing" val="west"/>
+      <a name="fanout" val="4"/>
+      <a name="incoming" val="4"/>
+      <a name="appear" val="center"/>
+    </comp>
+    <comp lib="0" loc="(430,540)" name="Tunnel">
+      <a name="facing" val="east"/>
+      <a name="width" val="4"/>
+      <a name="label" val="Cond"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="0" loc="(210,370)" name="Tunnel">
+      <a name="width" val="4"/>
+      <a name="label" val="OpCode"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="8" loc="(131,281)" name="Text">
+      <a name="text" val="rd"/>
+      <a name="font" val="SansSerif plain 12"/>
+    </comp>
+    <comp lib="8" loc="(123,415)" name="Text">
+      <a name="text" val="format"/>
+      <a name="font" val="SansSerif plain 12"/>
+    </comp>
+    <comp lib="0" loc="(200,200)" name="Tunnel">
+      <a name="width" val="12"/>
+      <a name="label" val="Operand2"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="8" loc="(109,345)" name="Text">
+      <a name="text" val="set cond flags"/>
+      <a name="font" val="SansSerif plain 12"/>
+    </comp>
+    <comp lib="8" loc="(124,368)" name="Text">
+      <a name="text" val="op code"/>
+      <a name="font" val="SansSerif plain 12"/>
+    </comp>
   </circuit>
   <circuit name="Decode">
     <a name="circuit" val="Decode"/>
