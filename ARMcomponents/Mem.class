@@ -1,0 +1,155 @@
+package edu.cornell.cs3410;
+
+import com.cburch.hex.HexModel;
+import com.cburch.hex.HexModelListener;
+import com.cburch.logisim.circuit.CircuitState;
+import com.cburch.logisim.data.Attribute;
+import com.cburch.logisim.data.AttributeSet;
+import com.cburch.logisim.data.Attributes;
+import com.cburch.logisim.data.BitWidth;
+import com.cburch.logisim.data.Bounds;
+import com.cburch.logisim.data.Direction;
+import com.cburch.logisim.gui.hex.HexFile;
+import com.cburch.logisim.gui.hex.HexFrame;
+import com.cburch.logisim.instance.Instance;
+import com.cburch.logisim.instance.InstanceFactory;
+import com.cburch.logisim.instance.InstancePainter;
+import com.cburch.logisim.instance.InstanceState;
+import com.cburch.logisim.instance.Port;
+import com.cburch.logisim.proj.Project;
+import com.cburch.logisim.tools.MenuExtender;
+import com.cburch.logisim.tools.key.BitWidthConfigurator;
+import com.cburch.logisim.util.GraphicsUtil;
+import com.cburch.logisim.util.StringGetter;
+import com.cburch.logisim.util.StringUtil;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.io.File;
+import java.io.IOException;
+import java.util.WeakHashMap;
+
+abstract class Mem
+  extends InstanceFactory
+{
+  public static final Attribute<BitWidth> ADDR_ATTR = Attributes.forBitWidth("addrWidth", Strings.getter("ramAddrWidthAttr"), 2, 24);
+  private static final int DATA_ATTR = 32;
+  static final int DATA = 0;
+  static final int ADDR = 1;
+  static final int CS = 2;
+  static final int MEM_INPUTS = 3;
+  static final int DELAY = 10;
+  private WeakHashMap<Instance, File> currentInstanceFiles = new WeakHashMap();
+  
+  Mem(String paramString, StringGetter paramStringGetter, int paramInt)
+  {
+    super(paramString, paramStringGetter);
+    setInstancePoker(MemPoker.class);
+    setKeyConfigurator(new BitWidthConfigurator(ADDR_ATTR, 2, 24, 0));
+    setOffsetBounds(Bounds.create(65396, -40, 140, 80));
+  }
+  
+  abstract void configurePorts(Instance paramInstance);
+  
+  public abstract AttributeSet createAttributeSet();
+  
+  abstract MemState getState(InstanceState paramInstanceState);
+  
+  abstract MemState getState(Instance paramInstance, CircuitState paramCircuitState);
+  
+  abstract HexFrame getHexFrame(Project paramProject, Instance paramInstance, CircuitState paramCircuitState);
+  
+  public abstract void propagate(InstanceState paramInstanceState);
+  
+  protected void configureNewInstance(Instance paramInstance)
+  {
+    configurePorts(paramInstance);
+  }
+  
+  void configureStandardPorts(Instance paramInstance, Port[] paramArrayOfPort)
+  {
+    paramArrayOfPort[0] = new Port(0, 0, "inout", 32);
+    paramArrayOfPort[1] = new Port(65396, 0, "input", ADDR_ATTR);
+    paramArrayOfPort[2] = new Port(-90, 40, "input", 4);
+    paramArrayOfPort[0].setToolTip(Strings.getter("memDataTip"));
+    paramArrayOfPort[1].setToolTip(Strings.getter("memAddrTip"));
+    paramArrayOfPort[2].setToolTip(new SimpleStringGetter("Byte selects: each 0 disables access to one byte of the addressed word."));
+  }
+  
+  public void paintInstance(InstancePainter paramInstancePainter)
+  {
+    Graphics localGraphics = paramInstancePainter.getGraphics();
+    Bounds localBounds = paramInstancePainter.getBounds();
+    paramInstancePainter.drawBounds();
+    Object localObject;
+    if (paramInstancePainter.getShowState())
+    {
+      localObject = getState(paramInstancePainter);
+      ((MemState)localObject).paint(paramInstancePainter.getGraphics(), localBounds.getX(), localBounds.getY());
+    }
+    else
+    {
+      localObject = (BitWidth)paramInstancePainter.getAttributeValue(ADDR_ATTR);
+      int i = ((BitWidth)localObject).getWidth();
+      int j = 1 << i + 2;
+      String str;
+      if (i >= 30) {
+        str = StringUtil.format(Strings.get("ramGigabyteLabel"), new String[] { "" + (j >>> 30) });
+      } else if (i >= 20) {
+        str = StringUtil.format(Strings.get("ramMegabyteLabel"), new String[] { "" + (j >> 20) });
+      } else if (i >= 10) {
+        str = StringUtil.format(Strings.get("ramKilobyteLabel"), new String[] { "" + (j >> 10) });
+      } else {
+        str = StringUtil.format(Strings.get("ramByteLabel"), new String[] { "" + j });
+      }
+      GraphicsUtil.drawCenteredText(localGraphics, str, localBounds.getX() + localBounds.getWidth() / 2, localBounds.getY() + localBounds.getHeight() / 2);
+    }
+    paramInstancePainter.drawPort(0, Strings.get("ramDataLabel"), Direction.WEST);
+    paramInstancePainter.drawPort(1, Strings.get("ramAddrLabel"), Direction.EAST);
+    localGraphics.setColor(Color.GRAY);
+    paramInstancePainter.drawPort(2, Strings.get("ramCSLabel"), Direction.SOUTH);
+  }
+  
+  File getCurrentImage(Instance paramInstance)
+  {
+    return (File)this.currentInstanceFiles.get(paramInstance);
+  }
+  
+  void setCurrentImage(Instance paramInstance, File paramFile)
+  {
+    this.currentInstanceFiles.put(paramInstance, paramFile);
+  }
+  
+  public void loadImage(InstanceState paramInstanceState, File paramFile)
+    throws IOException
+  {
+    MemState localMemState = getState(paramInstanceState);
+    HexFile.open(localMemState.getContents(), paramFile);
+    setCurrentImage(paramInstanceState.getInstance(), paramFile);
+  }
+  
+  protected Object getInstanceFeature(Instance paramInstance, Object paramObject)
+  {
+    if (paramObject == MenuExtender.class) {
+      return new MemMenu(this, paramInstance);
+    }
+    return super.getInstanceFeature(paramInstance, paramObject);
+  }
+  
+  static class MemListener
+    implements HexModelListener
+  {
+    Instance instance;
+    
+    MemListener(Instance paramInstance)
+    {
+      this.instance = paramInstance;
+    }
+    
+    public void metainfoChanged(HexModel paramHexModel) {}
+    
+    public void bytesChanged(HexModel paramHexModel, long paramLong1, long paramLong2, int[] paramArrayOfInt)
+    {
+      this.instance.fireInvalidated();
+    }
+  }
+}

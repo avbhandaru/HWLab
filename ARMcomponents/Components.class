@@ -1,0 +1,33 @@
+package edu.cornell.cs3410;
+
+import com.cburch.logisim.tools.AddTool;
+import com.cburch.logisim.tools.Library;
+import com.cburch.logisim.tools.Tool;
+import java.util.Arrays;
+import java.util.List;
+
+public class Components
+  extends Library
+{
+  private List<Tool> tools = Arrays.asList(new Tool[] { new AddTool(new RegisterFile32()), new AddTool(new Program32()), new AddTool(new ALU()), new AddTool(new Incrementer()), new AddTool(new Video()), new AddTool(new Ram()), new AddTool(new SPIM()), new AddTool(new RamIO()) });
+  
+  public String getName()
+  {
+    return "CS3410-Components";
+  }
+  
+  public String getDisplayName()
+  {
+    return "CS3410 Components";
+  }
+  
+  public List<Tool> getTools()
+  {
+    return this.tools;
+  }
+  
+  public boolean removeLibrary(String paramString)
+  {
+    return false;
+  }
+}

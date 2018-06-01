@@ -1,0 +1,24 @@
+package edu.cornell.cs3410;
+
+import com.cburch.logisim.util.StringGetter;
+
+public class SimpleStringGetter
+  implements StringGetter
+{
+  private String str;
+  
+  public SimpleStringGetter(String paramString)
+  {
+    this.str = paramString;
+  }
+  
+  public String get()
+  {
+    return this.str;
+  }
+  
+  public String toString()
+  {
+    return this.str;
+  }
+}

@@ -1,0 +1,65 @@
+package edu.cornell.cs3410;
+
+import com.cburch.logisim.data.BitWidth;
+import com.cburch.logisim.data.Bounds;
+import com.cburch.logisim.data.Value;
+import com.cburch.logisim.instance.InstanceState;
+import java.awt.Color;
+import java.awt.Graphics;
+
+public class RegisterUtils
+{
+  static final int NUM_REGISTERS = 32;
+  static final int NUM_BITS = 5;
+  static final BitWidth WIDTH = BitWidth.create(32);
+  static final BitWidth DEPTH = BitWidth.create(5);
+  static final int BOX_HEIGHT = 10;
+  static final int BOX_WIDTH = 50;
+  static final int COL_WIDTH = 65;
+  static final int BOX_SEP = 10;
+  static final int CHIP_WIDTH = 160;
+  static final int CHIP_DEPTH = 180;
+  static final int P_WDATA = 0;
+  static final int P_RDATA1 = 1;
+  static final int P_RDATA2 = 2;
+  static final int P_WE = 3;
+  static final int P_CLK = 4;
+  static final int P_WADDR = 5;
+  static final int P_RADDR1 = 6;
+  static final int P_RADDR2 = 7;
+  static final int NUM_PINS = 8;
+  static final Value zero = Value.createKnown(WIDTH, 0);
+  static final Value xxxx = Value.createError(WIDTH);
+  static final Value zzzz = Value.createUnknown(WIDTH);
+  
+  static int boxX(int paramInt)
+  {
+    if (paramInt < 16) {
+      return 25;
+    }
+    return 100;
+  }
+  
+  static Value val(InstanceState paramInstanceState, int paramInt)
+  {
+    return paramInstanceState.getPortValue(paramInt);
+  }
+  
+  static int addr(InstanceState paramInstanceState, int paramInt)
+  {
+    return paramInstanceState.getPortValue(paramInt).toIntValue();
+  }
+  
+  static int boxY(int paramInt)
+  {
+    paramInt %= 16;
+    return paramInt * 10 + 2;
+  }
+  
+  static void drawBox(Graphics paramGraphics, Bounds paramBounds, Color paramColor, int paramInt)
+  {
+    paramGraphics.setColor(paramColor);
+    paramGraphics.drawRect(paramBounds.getX() + boxX(paramInt), paramBounds.getY() + boxY(paramInt), 50, 10);
+    paramGraphics.setColor(Color.BLACK);
+  }
+}

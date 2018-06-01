@@ -1,0 +1,76 @@
+package edu.cornell.cs3410;
+
+import com.cburch.logisim.data.BitWidth;
+import com.cburch.logisim.data.Value;
+import com.cburch.logisim.instance.InstanceData;
+import com.cburch.logisim.instance.InstanceState;
+import com.cburch.logisim.instance.StdAttr;
+
+public class SPIMData
+  implements InstanceData, Cloneable
+{
+  private static final int N_REGS = 38;
+  private static final int NUM_BITS = 5;
+  private static final BitWidth WIDTH = BitWidth.create(32);
+  private static final BitWidth DEPTH = BitWidth.create(5);
+  private static final Value zero = Value.createKnown(WIDTH, 0);
+  private static final Value xxxx = Value.createError(WIDTH);
+  private static final Value zzzz = Value.createUnknown(WIDTH);
+  private Value lastClock;
+  Value[] regs;
+  
+  public static SPIMData get(InstanceState paramInstanceState)
+  {
+    SPIMData localSPIMData = (SPIMData)paramInstanceState.getData();
+    if (localSPIMData == null)
+    {
+      localSPIMData = new SPIMData(null, new Value[38]);
+      paramInstanceState.setData(localSPIMData);
+    }
+    return localSPIMData;
+  }
+  
+  private SPIMData(Value paramValue, Value[] paramArrayOfValue)
+  {
+    this.lastClock = paramValue;
+    this.regs = paramArrayOfValue;
+    this.regs[0] = zero;
+    reset(zero);
+  }
+  
+  public void reset(Value paramValue)
+  {
+    for (int i = 1; i < 38; i++) {
+      this.regs[i] = paramValue;
+    }
+  }
+  
+  public SPIMData clone()
+  {
+    try
+    {
+      return (SPIMData)super.clone();
+    }
+    catch (CloneNotSupportedException localCloneNotSupportedException) {}
+    return null;
+  }
+  
+  public boolean updateClock(Value paramValue, Object paramObject)
+  {
+    Value localValue = this.lastClock;
+    this.lastClock = paramValue;
+    if ((paramObject == null) || (paramObject == StdAttr.TRIG_RISING)) {
+      return (localValue == Value.FALSE) && (paramValue == Value.TRUE);
+    }
+    if (paramObject == StdAttr.TRIG_FALLING) {
+      return (localValue == Value.TRUE) && (paramValue == Value.FALSE);
+    }
+    if (paramObject == StdAttr.TRIG_HIGH) {
+      return paramValue == Value.TRUE;
+    }
+    if (paramObject == StdAttr.TRIG_LOW) {
+      return paramValue == Value.FALSE;
+    }
+    return (localValue == Value.FALSE) && (paramValue == Value.TRUE);
+  }
+}

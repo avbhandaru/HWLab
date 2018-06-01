@@ -1,0 +1,398 @@
+package edu.cornell.cs3410;
+
+import com.cburch.logisim.circuit.CircuitState;
+import com.cburch.logisim.data.Attribute;
+import com.cburch.logisim.data.AttributeEvent;
+import com.cburch.logisim.data.AttributeListener;
+import com.cburch.logisim.data.AttributeSet;
+import com.cburch.logisim.data.AttributeSets;
+import com.cburch.logisim.data.BitWidth;
+import com.cburch.logisim.data.Direction;
+import com.cburch.logisim.data.Location;
+import com.cburch.logisim.data.Value;
+import com.cburch.logisim.gui.hex.HexFrame;
+import com.cburch.logisim.instance.Instance;
+import com.cburch.logisim.instance.InstanceData;
+import com.cburch.logisim.instance.InstanceLogger;
+import com.cburch.logisim.instance.InstancePainter;
+import com.cburch.logisim.instance.InstanceState;
+import com.cburch.logisim.instance.Port;
+import com.cburch.logisim.instance.StdAttr;
+import com.cburch.logisim.proj.Project;
+import com.cburch.logisim.util.GraphicsUtil;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+public class Ram
+  extends Mem
+{
+  private static final int DATA_ATTR = 32;
+  private static final BitWidth dataBits = BitWidth.create(32);
+  private static Attribute<?>[] ATTRIBUTES = { Mem.ADDR_ATTR };
+  private static Object[] DEFAULTS = { BitWidth.create(20) };
+  private static final int OE = 3;
+  private static final int CLR = 4;
+  private static final int CLK = 5;
+  private static final int WE = 6;
+  private static final int DIN = 7;
+  private static Object[][] logOptions = new Object[9][];
+  static final Value[] vmask = { Value.createUnknown(BitWidth.create(32)), Value.createKnown(BitWidth.create(8), 0).extendWidth(32, Value.UNKNOWN), Value.createUnknown(BitWidth.create(8)).extendWidth(16, Value.FALSE).extendWidth(32, Value.UNKNOWN), Value.createKnown(BitWidth.create(16), 0).extendWidth(32, Value.UNKNOWN), Value.createUnknown(BitWidth.create(16)).extendWidth(24, Value.FALSE).extendWidth(32, Value.UNKNOWN), Value.createKnown(BitWidth.create(8), 0).extendWidth(16, Value.UNKNOWN).extendWidth(24, Value.FALSE).extendWidth(32, Value.UNKNOWN), Value.createUnknown(BitWidth.create(8)).extendWidth(24, Value.FALSE).extendWidth(32, Value.UNKNOWN), Value.createKnown(BitWidth.create(24), 0).extendWidth(32, Value.UNKNOWN), Value.createUnknown(BitWidth.create(24)).extendWidth(32, Value.FALSE), Value.createKnown(BitWidth.create(8), 0).extendWidth(24, Value.UNKNOWN).extendWidth(32, Value.FALSE), Value.createUnknown(BitWidth.create(8)).extendWidth(16, Value.FALSE).extendWidth(24, Value.UNKNOWN).extendWidth(32, Value.FALSE), Value.createKnown(BitWidth.create(16), 0).extendWidth(24, Value.UNKNOWN).extendWidth(32, Value.FALSE), Value.createUnknown(BitWidth.create(16)).extendWidth(32, Value.FALSE), Value.createKnown(BitWidth.create(8), 0).extendWidth(16, Value.UNKNOWN).extendWidth(32, Value.FALSE), Value.createUnknown(BitWidth.create(8)).extendWidth(32, Value.FALSE), Value.createKnown(BitWidth.create(32), 0) };
+  
+  public Ram()
+  {
+    super("MIPS RAM", new SimpleStringGetter("MIPS RAM"), 3);
+    setInstanceLogger(Logger.class);
+  }
+  
+  protected void configureNewInstance(Instance paramInstance)
+  {
+    super.configureNewInstance(paramInstance);
+    paramInstance.addAttributeListener();
+  }
+  
+  protected void instanceAttributeChanged(Instance paramInstance, Attribute<?> paramAttribute)
+  {
+    super.instanceAttributeChanged(paramInstance, paramAttribute);
+    configurePorts(paramInstance);
+  }
+  
+  void configurePorts(Instance paramInstance)
+  {
+    int i = 0;
+    int j = 1;
+    int k = 3;
+    if (i != 0) {
+      k += 2;
+    } else if (j != 0) {
+      k += 5;
+    } else {
+      k += 3;
+    }
+    Port[] arrayOfPort = new Port[k];
+    configureStandardPorts(paramInstance, arrayOfPort);
+    arrayOfPort[3] = new Port(-50, 40, "input", 1);
+    arrayOfPort[3].setToolTip(Strings.getter("ramOETip"));
+    arrayOfPort[4] = new Port(-30, 40, "input", 1);
+    arrayOfPort[4].setToolTip(Strings.getter("ramClrTip"));
+    if (i == 0)
+    {
+      arrayOfPort[5] = new Port(-70, 40, "input", 1);
+      arrayOfPort[5].setToolTip(Strings.getter("ramClkTip"));
+    }
+    if (j != 0)
+    {
+      arrayOfPort[6] = new Port(-110, 40, "input", 1);
+      arrayOfPort[6].setToolTip(Strings.getter("ramWETip"));
+      arrayOfPort[7] = new Port(65396, 20, "input", 32);
+      arrayOfPort[7].setToolTip(Strings.getter("ramInTip"));
+    }
+    else
+    {
+      arrayOfPort[0].setToolTip(Strings.getter("ramBusTip"));
+    }
+    paramInstance.setPorts(arrayOfPort);
+  }
+  
+  public AttributeSet createAttributeSet()
+  {
+    return AttributeSets.fixedSet(ATTRIBUTES, DEFAULTS);
+  }
+  
+  MemState getState(InstanceState paramInstanceState)
+  {
+    BitWidth localBitWidth = (BitWidth)paramInstanceState.getAttributeValue(ADDR_ATTR);
+    RamState localRamState = (RamState)paramInstanceState.getData();
+    if (localRamState == null)
+    {
+      MemContents localMemContents = MemContents.create(localBitWidth.getWidth(), dataBits.getWidth());
+      Instance localInstance = paramInstanceState.getInstance();
+      localRamState = new RamState(localInstance, localMemContents, new Mem.MemListener(localInstance));
+      paramInstanceState.setData(localRamState);
+    }
+    else
+    {
+      localRamState.setRam(paramInstanceState.getInstance());
+    }
+    return localRamState;
+  }
+  
+  MemState getState(Instance paramInstance, CircuitState paramCircuitState)
+  {
+    BitWidth localBitWidth = (BitWidth)paramInstance.getAttributeValue(ADDR_ATTR);
+    RamState localRamState = (RamState)paramInstance.getData(paramCircuitState);
+    if (localRamState == null)
+    {
+      MemContents localMemContents = MemContents.create(localBitWidth.getWidth(), dataBits.getWidth());
+      localRamState = new RamState(paramInstance, localMemContents, new Mem.MemListener(paramInstance));
+      paramInstance.setData(paramCircuitState, localRamState);
+    }
+    else
+    {
+      localRamState.setRam(paramInstance);
+    }
+    return localRamState;
+  }
+  
+  HexFrame getHexFrame(Project paramProject, Instance paramInstance, CircuitState paramCircuitState)
+  {
+    RamState localRamState = (RamState)getState(paramInstance, paramCircuitState);
+    return localRamState.getHexFrame(paramProject);
+  }
+  
+  public void propagate(InstanceState paramInstanceState)
+  {
+    RamState localRamState = (RamState)getState(paramInstanceState);
+    int i = 0;
+    int j = 1;
+    Value localValue1 = paramInstanceState.getPortValue(1);
+    Value localValue2 = paramInstanceState.getPortValue(2);
+    int k = (i != 0) || (localRamState.setClock(paramInstanceState.getPortValue(5), StdAttr.TRIG_RISING)) ? 1 : 0;
+    int m = paramInstanceState.getPortValue(3) != Value.FALSE ? 1 : 0;
+    int n = paramInstanceState.getPortValue(4) == Value.TRUE ? 1 : 0;
+    if (n != 0) {
+      localRamState.getContents().clear();
+    }
+    int i1 = 0;
+    int i2 = 0;
+    if (localValue2.get(0) != Value.FALSE)
+    {
+      i1 |= 0x1;
+      i2 |= 0xFF;
+    }
+    if (localValue2.get(1) != Value.FALSE)
+    {
+      i1 |= 0x2;
+      i2 |= 0xFF00;
+    }
+    if (localValue2.get(2) != Value.FALSE)
+    {
+      i1 |= 0x4;
+      i2 |= 0xFF0000;
+    }
+    if (localValue2.get(3) != Value.FALSE)
+    {
+      i1 |= 0x8;
+      i2 |= 0xFF000000;
+    }
+    if (i1 == 0)
+    {
+      localRamState.setCurrent(-1L, 0);
+      paramInstanceState.setPort(0, Value.createUnknown(dataBits), 10);
+      return;
+    }
+    int i3 = localValue1.toIntValue();
+    if ((!localValue1.isFullyDefined()) || (i3 < 0)) {
+      return;
+    }
+    if (i3 != localRamState.getCurrent())
+    {
+      localRamState.setCurrent(i3, i1);
+      localRamState.scrollToShow(i3);
+    }
+    else if (i1 != localRamState.getCurrentMask())
+    {
+      localRamState.setCurrent(i3, i1);
+    }
+    int i4;
+    Object localObject;
+    int i5;
+    int i6;
+    if ((n == 0) && (k != 0))
+    {
+      if (j != 0) {
+        i4 = paramInstanceState.getPortValue(6) != Value.FALSE ? 1 : 0;
+      } else {
+        i4 = m == 0 ? 1 : 0;
+      }
+      if (i4 != 0)
+      {
+        localObject = paramInstanceState.getPortValue(j != 0 ? 7 : 0);
+        i5 = ((Value)localObject).toIntValue();
+        i6 = localRamState.getContents().get(i3);
+        i5 = i5 & i2 | i6 & (i2 ^ 0xFFFFFFFF);
+        localRamState.getContents().set(i3, i5);
+      }
+    }
+    if (m != 0)
+    {
+      i4 = localRamState.getContents().get(i3);
+      localObject = vmask[i1].getAll();
+      for (i5 = 0; i5 < 4; i5++) {
+        if ((i1 & 1 << i5) != 0)
+        {
+          i6 = 0;
+          for (int i7 = i5 * 8; i6 < 8; i7++)
+          {
+            if ((i4 & 1 << i7) != 0) {
+              localObject[i7] = Value.TRUE;
+            }
+            i6++;
+          }
+        }
+      }
+      paramInstanceState.setPort(0, Value.create((Value[])localObject), 10);
+    }
+    else
+    {
+      paramInstanceState.setPort(0, vmask[0], 10);
+    }
+  }
+  
+  public void paintInstance(InstancePainter paramInstancePainter)
+  {
+    super.paintInstance(paramInstancePainter);
+    int i = 0;
+    int j = 1;
+    if (i == 0) {
+      paramInstancePainter.drawClock(5, Direction.NORTH);
+    }
+    paramInstancePainter.drawPort(3, Strings.get("ramOELabel"), Direction.SOUTH);
+    paramInstancePainter.drawPort(4, Strings.get("ramClrLabel"), Direction.SOUTH);
+    if (j != 0)
+    {
+      paramInstancePainter.drawPort(6, Strings.get("ramWELabel"), Direction.SOUTH);
+      paramInstancePainter.getGraphics().setColor(Color.BLACK);
+      paramInstancePainter.drawPort(7, Strings.get("ramDataLabel"), Direction.EAST);
+    }
+  }
+  
+  public void paintIcon(InstancePainter paramInstancePainter)
+  {
+    Graphics localGraphics = paramInstancePainter.getGraphics();
+    Font localFont = localGraphics.getFont();
+    localGraphics.setFont(localFont.deriveFont(9.0F));
+    GraphicsUtil.drawCenteredText(localGraphics, "RAM", 10, 9);
+    localGraphics.setFont(localFont);
+    localGraphics.drawRect(0, 4, 19, 12);
+    for (int i = 2; i < 20; i += 5)
+    {
+      localGraphics.drawLine(i, 2, i, 4);
+      localGraphics.drawLine(i, 16, i, 18);
+    }
+  }
+  
+  public static class Logger
+    extends InstanceLogger
+  {
+    public Object[] getLogOptions(InstanceState paramInstanceState)
+    {
+      int i = ((BitWidth)paramInstanceState.getAttributeValue(Mem.ADDR_ATTR)).getWidth();
+      if (i >= Ram.logOptions.length) {
+        i = Ram.logOptions.length - 1;
+      }
+      synchronized (Ram.logOptions)
+      {
+        Object[] arrayOfObject = Ram.logOptions[i];
+        if (arrayOfObject == null)
+        {
+          arrayOfObject = new Object[1 << i];
+          Ram.logOptions[i] = arrayOfObject;
+          for (int j = 0; j < arrayOfObject.length; j++) {
+            arrayOfObject[j] = Integer.valueOf(j);
+          }
+        }
+        return arrayOfObject;
+      }
+    }
+    
+    public String getLogName(InstanceState paramInstanceState, Object paramObject)
+    {
+      if ((paramObject instanceof Integer))
+      {
+        String str = "MIPSRAM";
+        Location localLocation = paramInstanceState.getInstance().getLocation();
+        return str + localLocation + "[" + paramObject + "]";
+      }
+      return null;
+    }
+    
+    public Value getLogValue(InstanceState paramInstanceState, Object paramObject)
+    {
+      if ((paramObject instanceof Integer))
+      {
+        MemState localMemState = (MemState)paramInstanceState.getData();
+        int i = ((Integer)paramObject).intValue();
+        return Value.createKnown(BitWidth.create(localMemState.getDataBits()), localMemState.getContents().get(i));
+      }
+      return Value.NIL;
+    }
+  }
+  
+  private static class RamState
+    extends MemState
+    implements InstanceData, AttributeListener
+  {
+    private Instance parent;
+    private Mem.MemListener listener;
+    private HexFrame hexFrame = null;
+    private ClockState clockState;
+    
+    RamState(Instance paramInstance, MemContents paramMemContents, Mem.MemListener paramMemListener)
+    {
+      super();
+      this.parent = paramInstance;
+      this.listener = paramMemListener;
+      this.clockState = new ClockState();
+      if (paramInstance != null) {
+        paramInstance.getAttributeSet().addAttributeListener(this);
+      }
+      paramMemContents.addHexModelListener(paramMemListener);
+    }
+    
+    void setRam(Instance paramInstance)
+    {
+      if (this.parent == paramInstance) {
+        return;
+      }
+      if (this.parent != null) {
+        this.parent.getAttributeSet().removeAttributeListener(this);
+      }
+      this.parent = paramInstance;
+      if (paramInstance != null) {
+        paramInstance.getAttributeSet().addAttributeListener(this);
+      }
+    }
+    
+    public RamState clone()
+    {
+      RamState localRamState = (RamState)super.clone();
+      localRamState.parent = null;
+      localRamState.clockState = this.clockState.clone();
+      localRamState.getContents().addHexModelListener(this.listener);
+      return localRamState;
+    }
+    
+    public HexFrame getHexFrame(Project paramProject)
+    {
+      if (this.hexFrame == null)
+      {
+        this.hexFrame = new HexFrame(paramProject, getContents());
+        this.hexFrame.addWindowListener(new WindowAdapter()
+        {
+          public void windowClosed(WindowEvent paramAnonymousWindowEvent)
+          {
+            Ram.RamState.this.hexFrame = null;
+          }
+        });
+      }
+      return this.hexFrame;
+    }
+    
+    public boolean setClock(Value paramValue, Object paramObject)
+    {
+      return this.clockState.updateClock(paramValue, paramObject);
+    }
+    
+    public void attributeListChanged(AttributeEvent paramAttributeEvent) {}
+    
+    public void attributeValueChanged(AttributeEvent paramAttributeEvent)
+    {
+      AttributeSet localAttributeSet = paramAttributeEvent.getSource();
+      BitWidth localBitWidth = (BitWidth)localAttributeSet.getValue(Mem.ADDR_ATTR);
+      getContents().setDimensions(localBitWidth.getWidth(), Ram.dataBits.getWidth());
+    }
+  }
+}

@@ -1,0 +1,30 @@
+package edu.cornell.cs3410;
+
+import com.cburch.logisim.util.LocaleManager;
+import com.cburch.logisim.util.StringGetter;
+import com.cburch.logisim.util.StringUtil;
+
+class Strings
+{
+  private static LocaleManager source = new LocaleManager("resources/logisim", "std");
+  
+  public static String get(String paramString)
+  {
+    return source.get(paramString);
+  }
+  
+  public static String get(String paramString1, String paramString2)
+  {
+    return StringUtil.format(source.get(paramString1), new String[] { paramString2 });
+  }
+  
+  public static String get(String paramString1, String paramString2, String paramString3)
+  {
+    return StringUtil.format(source.get(paramString1), new String[] { paramString2, paramString3 });
+  }
+  
+  public static StringGetter getter(String paramString)
+  {
+    return source.getter(paramString);
+  }
+}

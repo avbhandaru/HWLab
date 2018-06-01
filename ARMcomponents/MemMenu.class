@@ -1,0 +1,150 @@
+package edu.cornell.cs3410;
+
+import com.cburch.logisim.circuit.CircuitState;
+import com.cburch.logisim.data.AttributeSet;
+import com.cburch.logisim.gui.hex.HexFile;
+import com.cburch.logisim.gui.hex.HexFrame;
+import com.cburch.logisim.instance.Instance;
+import com.cburch.logisim.proj.Project;
+import com.cburch.logisim.tools.MenuExtender;
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import javax.swing.JFileChooser;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+
+class MemMenu
+  implements ActionListener, MenuExtender
+{
+  private Mem factory;
+  private Instance instance;
+  private Project proj;
+  private Frame frame;
+  private CircuitState circState;
+  private JMenuItem edit;
+  private JMenuItem clear;
+  private JMenuItem load;
+  private JMenuItem save;
+  
+  MemMenu(Mem paramMem, Instance paramInstance)
+  {
+    this.factory = paramMem;
+    this.instance = paramInstance;
+  }
+  
+  public void configureMenu(JPopupMenu paramJPopupMenu, Project paramProject)
+  {
+    this.proj = paramProject;
+    this.frame = paramProject.getFrame();
+    this.circState = paramProject.getCircuitState();
+    AttributeSet localAttributeSet = this.instance.getAttributeSet();
+    boolean bool = this.circState != null;
+    this.edit = createItem(bool, Strings.get("ramEditMenuItem"));
+    this.clear = createItem(bool, Strings.get("ramClearMenuItem"));
+    this.load = createItem(bool, Strings.get("ramLoadMenuItem"));
+    this.save = createItem(bool, Strings.get("ramSaveMenuItem"));
+    paramJPopupMenu.addSeparator();
+    paramJPopupMenu.add(this.edit);
+    paramJPopupMenu.add(this.clear);
+    paramJPopupMenu.add(this.load);
+    paramJPopupMenu.add(this.save);
+  }
+  
+  private JMenuItem createItem(boolean paramBoolean, String paramString)
+  {
+    JMenuItem localJMenuItem = new JMenuItem(paramString);
+    localJMenuItem.setEnabled(paramBoolean);
+    localJMenuItem.addActionListener(this);
+    return localJMenuItem;
+  }
+  
+  public void actionPerformed(ActionEvent paramActionEvent)
+  {
+    Object localObject = paramActionEvent.getSource();
+    if (localObject == this.edit) {
+      doEdit();
+    } else if (localObject == this.clear) {
+      doClear();
+    } else if (localObject == this.load) {
+      doLoad();
+    } else if (localObject == this.save) {
+      doSave();
+    }
+  }
+  
+  private void doEdit()
+  {
+    MemState localMemState = this.factory.getState(this.instance, this.circState);
+    if (localMemState == null) {
+      return;
+    }
+    HexFrame localHexFrame = this.factory.getHexFrame(this.proj, this.instance, this.circState);
+    localHexFrame.setVisible(true);
+    localHexFrame.toFront();
+  }
+  
+  private void doClear()
+  {
+    MemState localMemState = this.factory.getState(this.instance, this.circState);
+    boolean bool = localMemState.getContents().isClear();
+    if (bool) {
+      return;
+    }
+    int i = JOptionPane.showConfirmDialog(this.frame, Strings.get("ramConfirmClearMsg"), Strings.get("ramConfirmClearTitle"), 0);
+    if (i == 0) {
+      localMemState.getContents().clear();
+    }
+  }
+  
+  private void doLoad()
+  {
+    JFileChooser localJFileChooser = this.proj.createChooser();
+    File localFile1 = this.factory.getCurrentImage(this.instance);
+    if (localFile1 != null) {
+      localJFileChooser.setSelectedFile(localFile1);
+    }
+    localJFileChooser.setDialogTitle(Strings.get("ramLoadDialogTitle"));
+    int i = localJFileChooser.showOpenDialog(this.frame);
+    if (i == 0)
+    {
+      File localFile2 = localJFileChooser.getSelectedFile();
+      try
+      {
+        this.factory.loadImage(this.circState.getInstanceState(this.instance), localFile2);
+      }
+      catch (IOException localIOException)
+      {
+        JOptionPane.showMessageDialog(this.frame, localIOException.getMessage(), Strings.get("ramLoadErrorTitle"), 0);
+      }
+    }
+  }
+  
+  private void doSave()
+  {
+    MemState localMemState = this.factory.getState(this.instance, this.circState);
+    JFileChooser localJFileChooser = this.proj.createChooser();
+    File localFile1 = this.factory.getCurrentImage(this.instance);
+    if (localFile1 != null) {
+      localJFileChooser.setSelectedFile(localFile1);
+    }
+    localJFileChooser.setDialogTitle(Strings.get("ramSaveDialogTitle"));
+    int i = localJFileChooser.showSaveDialog(this.frame);
+    if (i == 0)
+    {
+      File localFile2 = localJFileChooser.getSelectedFile();
+      try
+      {
+        HexFile.save(localFile2, localMemState.getContents());
+        this.factory.setCurrentImage(this.instance, localFile2);
+      }
+      catch (IOException localIOException)
+      {
+        JOptionPane.showMessageDialog(this.frame, localIOException.getMessage(), Strings.get("ramSaveErrorTitle"), 0);
+      }
+    }
+  }
+}

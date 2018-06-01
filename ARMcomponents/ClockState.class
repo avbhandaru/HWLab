@@ -1,0 +1,39 @@
+package edu.cornell.cs3410;
+
+import com.cburch.logisim.data.Value;
+import com.cburch.logisim.instance.StdAttr;
+
+class ClockState
+  implements Cloneable
+{
+  private Value lastClock = Value.FALSE;
+  
+  public ClockState clone()
+  {
+    try
+    {
+      return (ClockState)super.clone();
+    }
+    catch (CloneNotSupportedException localCloneNotSupportedException) {}
+    return null;
+  }
+  
+  public boolean updateClock(Value paramValue, Object paramObject)
+  {
+    Value localValue = this.lastClock;
+    this.lastClock = paramValue;
+    if ((paramObject == null) || (paramObject == StdAttr.TRIG_RISING)) {
+      return (localValue == Value.FALSE) && (paramValue == Value.TRUE);
+    }
+    if (paramObject == StdAttr.TRIG_FALLING) {
+      return (localValue == Value.TRUE) && (paramValue == Value.FALSE);
+    }
+    if (paramObject == StdAttr.TRIG_HIGH) {
+      return paramValue == Value.TRUE;
+    }
+    if (paramObject == StdAttr.TRIG_LOW) {
+      return paramValue == Value.FALSE;
+    }
+    return (localValue == Value.FALSE) && (paramValue == Value.TRUE);
+  }
+}
