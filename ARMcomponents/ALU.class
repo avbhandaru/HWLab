@@ -1,0 +1,122 @@
+package edu.cornell.cs3410;
+
+import com.cburch.logisim.data.BitWidth;
+import com.cburch.logisim.data.Bounds;
+import com.cburch.logisim.data.Direction;
+import com.cburch.logisim.data.Value;
+import com.cburch.logisim.instance.InstanceFactory;
+import com.cburch.logisim.instance.InstancePainter;
+import com.cburch.logisim.instance.InstanceState;
+import com.cburch.logisim.instance.Port;
+import com.cburch.logisim.util.GraphicsUtil;
+import java.awt.Color;
+import java.awt.Graphics;
+
+public class ALU
+  extends InstanceFactory
+{
+  public ALU()
+  {
+    super("Mips ALU");
+    setOffsetBounds(Bounds.create(-30, -50, 60, 100));
+    setPorts(new Port[] { new Port(-30, -30, "input", 32), new Port(-30, 30, "input", 32), new Port(-10, 40, "input", 4), new Port(10, 30, "input", 5), new Port(30, 0, "output", 32) });
+  }
+
+  public int shiftOp(int sop, int sa, int m) {
+    if (sop == 0) {
+      return m << sa; // left shift
+    } else if (sop == 1) {
+      return m >>> sa; // logical right shift
+    } else if (sop == 2) {
+      return m >> sa; // arithmetic right shift
+    } else {
+      return Integer.rotateRight(m, sa); // rotate bits
+      // return (bits >>> k) | (bits << (Integer.SIZE - k)); //(should also work)
+    }
+  }
+  
+  public void propagate(InstanceState paramInstanceState)
+  {
+    int i = paramInstanceState.getPortValue(0).toIntValue(); // N
+    int j = paramInstanceState.getPortValue(1).toIntValue(); // M
+    int k = paramInstanceState.getPortValue(2).toIntValue(); // OP
+    int m = paramInstanceState.getPortValue(3).toIntValue(); // SA
+    int s = paramInstanceState.getPortValue(5).toIntValue(); // shift op code
+    int n = 0;
+    j = shiftOp(s, m, j);
+    switch (k)
+    {
+    case 0: 
+    case 1: // left shift logical some amount
+      n = j << m;
+      break;
+    case 2: 
+    case 3: // add
+      n = i + j;
+      break;
+    case 4: // right shift logical
+      n = j >>> m;
+      break;
+    case 5: // right shift arithmetic
+      n = j >> m;
+      break;
+    case 6: 
+    case 7: // subtract
+      n = i - j;
+      break;
+    case 8: // and
+      n = i & j;
+      break;
+    case 10: // or
+      n = i | j;
+      break;
+    case 12: // exclusive or
+      n = i ^ j;
+      break;
+    case 14: // exclusive nor
+      n = (i | j) ^ 0xFFFFFFFF;
+      break;
+    case 9: // not equals
+      n = i != j ? 1 : 0;
+      break;
+    case 11: // equals
+      n = i == j ? 1 : 0;
+      break;
+    case 13: // less than or equal to
+      n = i <= 0 ? 1 : 0;
+      break;
+    case 15: // greater than 
+      n = i > 0 ? 1 : 0;
+    }
+    Value localValue = Value.createKnown(BitWidth.create(32), n);
+    paramInstanceState.setPort(4, localValue, 32);
+  }
+  
+  public void paintInstance(InstancePainter paramInstancePainter)
+  {
+    Bounds localBounds = paramInstancePainter.getBounds();
+    int i = localBounds.getX();
+    int j = i + localBounds.getWidth();
+    int k = localBounds.getY();
+    int m = k + localBounds.getHeight();
+    int[] arrayOfInt1 = { i, j, j, i, i, i + 20, i };
+    int[] arrayOfInt2 = { k, k + 30, m - 30, m, m - 40, m - 50, m - 60 };
+    GraphicsUtil.switchToWidth(paramInstancePainter.getGraphics(), 2);
+    paramInstancePainter.getGraphics().drawPolygon(arrayOfInt1, arrayOfInt2, 7);
+    paramInstancePainter.drawPort(0, "N", Direction.EAST); // this is main input operand
+    paramInstancePainter.drawPort(1, "M", Direction.EAST);
+    paramInstancePainter.drawPort(2, "OP", Direction.SOUTH);
+    paramInstancePainter.drawPort(3, "SA", Direction.SOUTH);
+    paramInstancePainter.drawPort(4, "C", Direction.WEST);
+    paramInstancePainter.drawPort(5, "SOP", Direction.SOUTH);
+  }
+  
+  public void paintIcon(InstancePainter paramInstancePainter)
+  {
+    Graphics localGraphics = paramInstancePainter.getGraphics();
+    localGraphics.setColor(Color.BLACK);
+    int[] arrayOfInt1 = { 0, 15, 15, 0, 0, 3, 0 };
+    int[] arrayOfInt2 = { 0, 5, 10, 15, 10, 8, 6 };
+    localGraphics.drawPolygon(arrayOfInt1, arrayOfInt2, 7);
+  }
+}

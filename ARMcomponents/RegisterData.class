@@ -1,0 +1,68 @@
+package edu.cornell.cs3410;
+
+import com.cburch.logisim.data.Value;
+import com.cburch.logisim.instance.InstanceData;
+import com.cburch.logisim.instance.InstanceState;
+import com.cburch.logisim.instance.StdAttr;
+
+public class RegisterData
+  implements InstanceData, Cloneable
+{
+  private Value lastClock;
+  Value[] regs;
+  
+  public static RegisterData get(InstanceState paramInstanceState)
+  {
+    RegisterData localRegisterData = (RegisterData)paramInstanceState.getData();
+    if (localRegisterData == null)
+    {
+      localRegisterData = new RegisterData(null, new Value[32]);
+      paramInstanceState.setData(localRegisterData);
+    }
+    return localRegisterData;
+  }
+  
+  private RegisterData(Value paramValue, Value[] paramArrayOfValue)
+  {
+    this.lastClock = paramValue;
+    this.regs = paramArrayOfValue;
+    this.regs[0] = RegisterUtils.zero;
+    reset(RegisterUtils.zero);
+  }
+  
+  public void reset(Value paramValue)
+  {
+    for (int i = 1; i < 32; i++) {
+      this.regs[i] = paramValue;
+    }
+  }
+  
+  public RegisterData clone()
+  {
+    try
+    {
+      return (RegisterData)super.clone();
+    }
+    catch (CloneNotSupportedException localCloneNotSupportedException) {}
+    return null;
+  }
+  
+  public boolean updateClock(Value paramValue, Object paramObject)
+  {
+    Value localValue = this.lastClock;
+    this.lastClock = paramValue;
+    if ((paramObject == null) || (paramObject == StdAttr.TRIG_RISING)) {
+      return (localValue == Value.FALSE) && (paramValue == Value.TRUE);
+    }
+    if (paramObject == StdAttr.TRIG_FALLING) {
+      return (localValue == Value.TRUE) && (paramValue == Value.FALSE);
+    }
+    if (paramObject == StdAttr.TRIG_HIGH) {
+      return paramValue == Value.TRUE;
+    }
+    if (paramObject == StdAttr.TRIG_LOW) {
+      return paramValue == Value.FALSE;
+    }
+    return (localValue == Value.FALSE) && (paramValue == Value.TRUE);
+  }
+}

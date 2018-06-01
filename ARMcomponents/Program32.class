@@ -1,0 +1,264 @@
+package edu.cornell.cs3410;
+
+import com.cburch.logisim.data.Attribute;
+import com.cburch.logisim.data.AttributeSet;
+import com.cburch.logisim.data.Bounds;
+import com.cburch.logisim.data.Value;
+import com.cburch.logisim.gui.main.Frame;
+import com.cburch.logisim.instance.Instance;
+import com.cburch.logisim.instance.InstanceFactory;
+import com.cburch.logisim.instance.InstancePainter;
+import com.cburch.logisim.instance.InstancePoker;
+import com.cburch.logisim.instance.InstanceState;
+import com.cburch.logisim.instance.Port;
+import com.cburch.logisim.proj.Project;
+import com.cburch.logisim.util.GraphicsUtil;
+import com.cburch.logisim.util.StringUtil;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Window;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.IOException;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
+class Program32
+  extends InstanceFactory
+{
+  static final int NUM_ROWS = 5;
+  static final int CHIP_WIDTH = 240;
+  static final int CHIP_DEPTH = 120;
+  static final int PC_WIDTH = 32;
+  static final int INST_WIDTH = 32;
+  static final int BOX_WIDTH = 196;
+  static final int ACOL_WIDTH = 54;
+  static final int ARROW_WIDTH = 20;
+  static final int P_PC = 0;
+  static final int P_OP = 1;
+  static final int NUM_PINS = 2;
+  public static final Attribute<ProgramAssembler.Listing> CONTENTS_ATTR = new ContentsAttribute();
+  
+  public Program32()
+  {
+    super("MIPSProgramROM", new SimpleStringGetter("MIPS Program ROM"));
+    setAttributes(new Attribute[] { CONTENTS_ATTR }, new Object[] { new ProgramAssembler.Listing() });
+    setOffsetBounds(Bounds.create(65296, -60, 240, 120));
+    setPorts(new Port[] { new Port(65306, 60, "input", 32), new Port(0, 0, "output", 32) });
+    setInstancePoker(ProgramPoker.class);
+  }
+  
+  private ProgramAssembler.Listing getCode(InstanceState paramInstanceState)
+  {
+    return (ProgramAssembler.Listing)paramInstanceState.getAttributeValue(CONTENTS_ATTR);
+  }
+  
+  private Value val(InstanceState paramInstanceState, int paramInt)
+  {
+    return paramInstanceState.getPortValue(paramInt);
+  }
+  
+  private int addr(InstanceState paramInstanceState, int paramInt)
+  {
+    return val(paramInstanceState, paramInt).toIntValue();
+  }
+  
+  public void propagate(InstanceState paramInstanceState)
+  {
+    ProgramState localProgramState = ProgramState.get(paramInstanceState, getCode(paramInstanceState));
+    localProgramState.update(val(paramInstanceState, 0));
+    paramInstanceState.setPort(1, localProgramState.instr(), 9);
+  }
+  
+  public AttributeSet createAttributeSet()
+  {
+    return new ProgramAttributes();
+  }
+  
+  private void drawBox(Graphics paramGraphics, Bounds paramBounds, Color paramColor)
+  {
+    paramGraphics.setColor(Color.WHITE);
+    paramGraphics.fillRect(paramBounds.getX() + 20, paramBounds.getY() + 5, 54, 110);
+    paramGraphics.fillRect(paramBounds.getX() + 20, paramBounds.getY() + 5, 196, 110);
+    paramGraphics.setColor(paramColor);
+    paramGraphics.drawRect(paramBounds.getX() + 20, paramBounds.getY() + 5, 54, 110);
+    paramGraphics.drawRect(paramBounds.getX() + 20, paramBounds.getY() + 5, 196, 110);
+    paramGraphics.setColor(Color.BLACK);
+  }
+  
+  private void drawArrow(Graphics paramGraphics, Bounds paramBounds, Color paramColor)
+  {
+    int i = paramBounds.getX() + 20 - 13;
+    int j = paramBounds.getY() + 50 + 10;
+    int[] arrayOfInt1 = { i, i + 8, i, i };
+    int[] arrayOfInt2 = { j - 5, j, j + 5, j - 5 };
+    paramGraphics.setColor(paramColor);
+    paramGraphics.fillPolygon(arrayOfInt1, arrayOfInt2, 4);
+    paramGraphics.setColor(Color.BLACK);
+    paramGraphics.drawPolyline(arrayOfInt1, arrayOfInt2, 4);
+  }
+  
+  public void paintInstance(InstancePainter paramInstancePainter)
+  {
+    Bounds localBounds = paramInstancePainter.getBounds();
+    paramInstancePainter.drawRectangle(localBounds, "");
+    Graphics localGraphics = paramInstancePainter.getGraphics();
+    GraphicsUtil.drawText(localGraphics, "PC", localBounds.getX() + 2, localBounds.getY() + 120 - 12, -1, 0);
+    GraphicsUtil.drawText(localGraphics, "Op", localBounds.getX() + 240 - 2, localBounds.getY() + 60, 1, 0);
+    paramInstancePainter.drawPort(0);
+    paramInstancePainter.drawPort(1);
+    drawBox(localGraphics, localBounds, Color.GRAY);
+    if (paramInstancePainter.getShowState()) {
+      drawState(paramInstancePainter);
+    }
+  }
+  
+  public void paintIcon(InstancePainter paramInstancePainter)
+  {
+    Graphics localGraphics = paramInstancePainter.getGraphics();
+    Font localFont = localGraphics.getFont();
+    localGraphics.setFont(localFont.deriveFont(9.0F));
+    GraphicsUtil.drawCenteredText(localGraphics, "ASM", 10, 9);
+    localGraphics.setFont(localFont);
+    localGraphics.drawRect(0, 4, 19, 12);
+    for (int i = 2; i < 20; i += 5)
+    {
+      localGraphics.drawLine(i, 2, i, 4);
+      localGraphics.drawLine(i, 16, i, 18);
+    }
+  }
+  
+  private void drawState(InstancePainter paramInstancePainter)
+  {
+    Font localFont = new Font("Monospaced", 0, 10);
+    ProgramState localProgramState = ProgramState.get(paramInstancePainter, getCode(paramInstancePainter));
+    if ((localProgramState.code == null) || (localProgramState.code.isEmpty())) {
+      return;
+    }
+    Graphics localGraphics = paramInstancePainter.getGraphics();
+    Bounds localBounds = paramInstancePainter.getBounds();
+    Color localColor;
+    if (localProgramState.isErrorPC()) {
+      localColor = Color.RED;
+    } else if (localProgramState.isUndefinedPC()) {
+      localColor = Color.GRAY;
+    } else if (localProgramState.haveCodeFor(localProgramState.pc)) {
+      localColor = Color.BLUE;
+    } else {
+      localColor = Color.BLUE;
+    }
+    drawArrow(localGraphics, localBounds, localColor);
+    int i = -1;
+    int j = localProgramState.isValidPC() ? localProgramState.pc : -1;
+    for (int k = j - 2; k <= j + 2; k++)
+    {
+      i++;
+      if ((k >= 0) && (k <= 1073741823))
+      {
+        if (k == localProgramState.pc) {
+          localGraphics.setColor(Color.BLUE);
+        } else if (!localProgramState.haveCodeFor(k)) {
+          localGraphics.setColor(Color.GRAY);
+        }
+        GraphicsUtil.drawText(localGraphics, localFont, StringUtil.toHexString(32, k * 4), localBounds.getX() + 20 + 2, localBounds.getY() + 20 * i + 10 + 10, -1, 0);
+        GraphicsUtil.drawText(localGraphics, localFont, localProgramState.decode(k), localBounds.getX() + 20 + 54 + 1, localBounds.getY() + 20 * i + 10 + 10, -1, 0);
+        localGraphics.setColor(Color.BLACK);
+      }
+    }
+  }
+  
+  public static class ProgramPoker
+    extends InstancePoker
+  {
+    public boolean init(InstanceState paramInstanceState, MouseEvent paramMouseEvent)
+    {
+      return paramInstanceState.getInstance().getBounds().contains(paramMouseEvent.getX(), paramMouseEvent.getY());
+    }
+  }
+  
+  private static class ContentsCell
+    extends JLabel
+    implements MouseListener
+  {
+    private static final long serialVersionUID = -2005158851998108994L;
+    private Window source;
+    private ProgramAssembler.Listing code;
+    
+    ContentsCell(Window paramWindow, ProgramAssembler.Listing paramListing)
+    {
+      super();
+      this.source = paramWindow;
+      this.code = paramListing;
+      addMouseListener(this);
+    }
+    
+    public void mouseClicked(MouseEvent paramMouseEvent)
+    {
+      if (this.code == null) {
+        return;
+      }
+      Project localProject = (this.source instanceof Frame) ? ((Frame)this.source).getProject() : null;
+      ProgramFrame32 localProgramFrame32 = ProgramAttributes.getProgramFrame(this.code, localProject);
+      localProgramFrame32.setVisible(true);
+      localProgramFrame32.toFront();
+    }
+    
+    public void mousePressed(MouseEvent paramMouseEvent) {}
+    
+    public void mouseReleased(MouseEvent paramMouseEvent) {}
+    
+    public void mouseEntered(MouseEvent paramMouseEvent) {}
+    
+    public void mouseExited(MouseEvent paramMouseEvent) {}
+  }
+  
+  private static class ContentsAttribute
+    extends Attribute<ProgramAssembler.Listing>
+  {
+    public ContentsAttribute()
+    {
+      super(new SimpleStringGetter("MIPS Program Listing"));
+    }
+    
+    public Component getCellEditor(Window paramWindow, ProgramAssembler.Listing paramListing)
+    {
+      if ((paramWindow instanceof Frame))
+      {
+        localObject = ((Frame)paramWindow).getProject();
+        ProgramAssembler.Listing localListing = paramListing;
+        ProgramState localProgramState = localListing.getState();
+        if (localProgramState != null) {
+          localProgramState.setProject((Project)localObject);
+        }
+      }
+      Object localObject = new Program32.ContentsCell(paramWindow, paramListing);
+      ((Program32.ContentsCell)localObject).mouseClicked(null);
+      return (Component)localObject;
+    }
+    
+    public String toDisplayString(ProgramAssembler.Listing paramListing)
+    {
+      return "(click to edit)";
+    }
+    
+    public String toStandardString(ProgramAssembler.Listing paramListing)
+    {
+      return paramListing.getSource();
+    }
+    
+    public ProgramAssembler.Listing parse(String paramString)
+    {
+      try
+      {
+        return new ProgramAssembler.Listing(paramString);
+      }
+      catch (IOException localIOException)
+      {
+        JOptionPane.showMessageDialog(null, "The contents of the Program chip could not be read: " + localIOException.getMessage(), "Error loading MIPS program.", 0);
+      }
+      return new ProgramAssembler.Listing();
+    }
+  }
+}

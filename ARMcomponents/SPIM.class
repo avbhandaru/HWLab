@@ -1,0 +1,1400 @@
+package edu.cornell.cs3410;
+
+import com.cburch.logisim.data.Attribute;
+import com.cburch.logisim.data.Attributes;
+import com.cburch.logisim.data.BitWidth;
+import com.cburch.logisim.data.Bounds;
+import com.cburch.logisim.data.Direction;
+import com.cburch.logisim.data.Value;
+import com.cburch.logisim.instance.InstanceFactory;
+import com.cburch.logisim.instance.InstancePainter;
+import com.cburch.logisim.instance.InstanceState;
+import com.cburch.logisim.instance.Port;
+import com.cburch.logisim.instance.StdAttr;
+import com.cburch.logisim.util.GraphicsUtil;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class SPIM
+  extends InstanceFactory
+{
+  public static Fetch fetch;
+  public static Decode decode;
+  public static Execute execute;
+  public static Memory memory;
+  public static WriteBack wb;
+  public static Staller staller;
+  public static ExceptionUnit exceptionUnit;
+  private static ClockState clockState;
+  private static final Attribute<Integer> ATTR_BUFFER = Attributes.forIntegerRange("buflen", Strings.getter("SPIMBufferLengthAttr"), 1, 256);
+  private static Pattern pat1 = Pattern.compile("\\s*,\\s*");
+  private static HashMap<String, InstType> m;
+  
+  public SPIM()
+  {
+    super("SPIM", Strings.getter("MIPS Core with Exception Support"));
+    setAttributes(new Attribute[] { ATTR_BUFFER, StdAttr.EDGE_TRIGGER }, new Object[] { Integer.valueOf(32), StdAttr.TRIG_RISING });
+    setOffsetBounds(Bounds.create(0, 0, 240, 260));
+    setIconName("SPIM.gif");
+    m = new HashMap();
+    set_support_mips_inst(m);
+    clockState = new ClockState();
+    fetch = new Fetch();
+    decode = new Decode();
+    execute = new Execute();
+    memory = new Memory();
+    wb = new WriteBack();
+    staller = new Staller();
+    exceptionUnit = new ExceptionUnit();
+    Port[] arrayOfPort = new Port[10];
+    arrayOfPort[0] = new Port(0, 240, "input", 1);
+    arrayOfPort[1] = new Port(20, 260, "input", 32);
+    arrayOfPort[2] = new Port(40, 260, "output", 32);
+    arrayOfPort[3] = new Port(240, 20, "output", 24);
+    arrayOfPort[4] = new Port(240, 40, "output", 32);
+    arrayOfPort[5] = new Port(240, 60, "input", 32);
+    arrayOfPort[6] = new Port(240, 80, "output", 1);
+    arrayOfPort[7] = new Port(240, 100, "output", 4);
+    arrayOfPort[8] = new Port(240, 120, "output", 1);
+    arrayOfPort[9] = new Port(80, 260, "input", 1);
+    setPorts(arrayOfPort);
+  }
+  
+  public void propagate(InstanceState paramInstanceState)
+  {
+    SPIMData localSPIMData = SPIMData.get(paramInstanceState);
+    int i = paramInstanceState.getPortValue(1).toIntValue();
+    boolean bool1 = clockState.updateClock(paramInstanceState.getPortValue(0), StdAttr.TRIG_RISING);
+    boolean bool2 = clockState.updateClock(paramInstanceState.getPortValue(0), StdAttr.TRIG_LOW);
+    boolean bool3 = false;
+    if (bool1)
+    {
+      String str = ProgramAssembler.disassemble(i, fetch.PC);
+      str = pat1.matcher(str).replaceAll(" ");
+      str.replaceAll(",", " ");
+      Instruction localInstruction = new Instruction(str);
+      p(new String[] { "==========================" });
+      p(new String[] { "+++++++Rising Edge++++++++" });
+      p(new String[] { "fetched: " + Integer.toHexString(fetch.PC) + " " + str });
+      pf("PC      %20x%20x%20x%20x%20x\n", new Integer[] { Integer.valueOf(fetch.PC), Integer.valueOf(decode.PC), Integer.valueOf(execute.PC), Integer.valueOf(memory.PC), Integer.valueOf(wb.PC) });
+      wb.inst = memory.inst;
+      memory.inst = execute.inst;
+      execute.inst = decode.inst;
+      decode.inst = fetch.inst;
+      wb.PC = memory.PC;
+      memory.PC = execute.PC;
+      execute.PC = decode.PC;
+      if (!fetch.stall) {
+        decode.PC = fetch.PC;
+      }
+      staller.step(fetch, decode, execute, memory);
+      fetch.step(localInstruction, localSPIMData, decode);
+      decode.step(localSPIMData, memory, wb, fetch, execute);
+      execute.step(localSPIMData, fetch, decode);
+      memory.step(paramInstanceState);
+      print_mips_debug_info(fetch, decode, execute, memory, wb);
+      paramInstanceState.setPort(2, Value.createKnown(BitWidth.create(32), fetch.PC), 1);
+      if (paramInstanceState.getPortValue(9).toIntValue() == 1)
+      {
+        j = localSPIMData.regs[36].toIntValue();
+        j |= 0x0;
+        localSPIMData.regs[36] = Value.createKnown(BitWidth.create(32), j);
+        int k = localSPIMData.regs[35].toIntValue();
+        k |= 0x100;
+        localSPIMData.regs[35] = Value.createKnown(BitWidth.create(32), k);
+      }
+      int j = localSPIMData.regs[35].toIntValue();
+      j |= 0x10;
+      localSPIMData.regs[35] = Value.createKnown(BitWidth.create(32), j);
+      exceptionUnit.step(fetch, decode, execute, memory, wb, paramInstanceState, localSPIMData);
+    }
+    if (paramInstanceState.getPortValue(0).toIntValue() == 0)
+    {
+      p(new String[] { ".....falling edge....." });
+      bool3 = (fetch.inst.opcode == 0) && (decode.inst.opcode == 0) && (execute.inst.opcode == 0) && (memory.inst.opcode == 0);
+      wb.step(localSPIMData, bool3);
+    }
+    if (bool2)
+    {
+      decode.step_level(localSPIMData, memory, wb, fetch, execute);
+      memory.step_level(paramInstanceState);
+    }
+  }
+  
+  public void paintInstance(InstancePainter paramInstancePainter)
+  {
+    Graphics localGraphics = paramInstancePainter.getGraphics();
+    Bounds localBounds = paramInstancePainter.getBounds();
+    Font localFont = localGraphics.getFont().deriveFont(9.0F);
+    SPIMData localSPIMData = SPIMData.get(paramInstancePainter);
+    boolean bool = paramInstancePainter.getShowState();
+    paramInstancePainter.drawBounds();
+    paramInstancePainter.drawClock(0, Direction.EAST);
+    paramInstancePainter.drawPort(1, "OP", Direction.SOUTH);
+    paramInstancePainter.drawPort(2, "PC", Direction.SOUTH);
+    paramInstancePainter.drawPort(3, "ADDR", Direction.WEST);
+    paramInstancePainter.drawPort(4, "DOUT", Direction.WEST);
+    paramInstancePainter.drawPort(5, "DIN", Direction.WEST);
+    paramInstancePainter.drawPort(6, "STR", Direction.WEST);
+    paramInstancePainter.drawPort(7, "SEL", Direction.WEST);
+    paramInstancePainter.drawPort(8, "LD", Direction.WEST);
+    paramInstancePainter.drawPort(9, "IRQ_IN", Direction.SOUTH);
+    for (int i = 0; i < 32; i++) {
+      SPIMUtils.drawBox(localGraphics, localBounds, Color.GRAY, i);
+    }
+    for (i = 0; i < 32; i++) {
+      GraphicsUtil.drawText(localGraphics, localFont, "$" + i, localBounds.getX() + SPIMUtils.boxX(i) - 1, localBounds.getY() + SPIMUtils.boxY(i) + 4, 1, 0);
+    }
+    if (!paramInstancePainter.getShowState()) {
+      return;
+    }
+    localGraphics.setColor(Color.LIGHT_GRAY);
+    localGraphics.fillRect(localBounds.getX() + SPIMUtils.boxX(0) + 1, localBounds.getY() + SPIMUtils.boxY(0) + 1, 49, 9);
+    localGraphics.setColor(Color.BLACK);
+    String str;
+    for (i = 0; i < 32; i++)
+    {
+      str = localSPIMData.regs[i].isFullyDefined() ? localSPIMData.regs[i].toHexString() : "?";
+      GraphicsUtil.drawText(localGraphics, localFont, str, localBounds.getX() + SPIMUtils.boxX(i) + 25, localBounds.getY() + SPIMUtils.boxY(i) + 4, 0, 0);
+    }
+    localGraphics.drawRect(localBounds.getX() + localBounds.getWidth() / 4 * 3 + 10, localBounds.getY() + 10, localBounds.getWidth() / 4 - 10, localBounds.getHeight() / 2);
+    GraphicsUtil.drawCenteredText(localGraphics, "CPU + RAM CNTL", localBounds.getX() + localBounds.getWidth() / 4 * 3, localBounds.getY() + localBounds.getHeight() - 40);
+    GraphicsUtil.drawText(localGraphics, localFont, "BadVAddr ", localBounds.getX() + SPIMUtils.cp_x(34) + 25, localBounds.getY() + SPIMUtils.cp_y(34) + 5, 0, 0);
+    GraphicsUtil.drawText(localGraphics, localFont, "Status ", localBounds.getX() + SPIMUtils.cp_x(35) + 25, localBounds.getY() + SPIMUtils.cp_y(35) + 5, 0, 0);
+    GraphicsUtil.drawText(localGraphics, localFont, "Cause ", localBounds.getX() + SPIMUtils.cp_x(36) + 25, localBounds.getY() + SPIMUtils.cp_y(36) + 5, 0, 0);
+    GraphicsUtil.drawText(localGraphics, localFont, "EPC ", localBounds.getX() + SPIMUtils.cp_x(37) + 25, localBounds.getY() + SPIMUtils.cp_y(37) + 5, 0, 0);
+    for (i = 34; i < 38; i++)
+    {
+      str = localSPIMData.regs[i].isFullyDefined() ? localSPIMData.regs[i].toHexString() : "?";
+      GraphicsUtil.drawText(localGraphics, localFont, str, localBounds.getX() + SPIMUtils.cp_x(i) + 75, localBounds.getY() + SPIMUtils.cp_y(i) + 4, 0, 0);
+      SPIMUtils.drawCPBox(localGraphics, localBounds, Color.GRAY, i);
+    }
+  }
+  
+  private static <printabletostring> void p(printabletostring... paramVarArgs)
+  {
+    for (printabletostring ? : paramVarArgs) {
+      System.out.print(?);
+    }
+    System.out.println();
+  }
+  
+  private static <printabletostring> void pf(String paramString, printabletostring... paramVarArgs)
+  {
+    System.out.format(paramString, paramVarArgs);
+  }
+  
+  private void print_mips_debug_info(Fetch paramFetch, Decode paramDecode, Execute paramExecute, Memory paramMemory, WriteBack paramWriteBack)
+  {
+    pf("Inst    %20s%20s%20s%20s%20s\n", new Instruction[] { paramFetch.inst, paramDecode.inst, paramExecute.inst, paramMemory.inst, paramWriteBack.inst });
+    pf("flush   %20b%20b%20b%20b%20b\n", new Boolean[] { Boolean.valueOf(paramFetch.inst.flush), Boolean.valueOf(paramDecode.inst.flush), Boolean.valueOf(paramExecute.inst.flush), Boolean.valueOf(paramMemory.inst.flush), Boolean.valueOf(paramWriteBack.inst.flush) });
+    pf("Rs      %20d%20d%20d%20d%20d\n", new Integer[] { Integer.valueOf(paramFetch.inst.rs), Integer.valueOf(paramDecode.inst.rs), Integer.valueOf(paramExecute.inst.rs), Integer.valueOf(paramMemory.inst.rs), Integer.valueOf(paramWriteBack.inst.rs) });
+    pf("Rt      %20d%20d%20d%20d%20d\n", new Integer[] { Integer.valueOf(paramFetch.inst.rt), Integer.valueOf(paramDecode.inst.rt), Integer.valueOf(paramExecute.inst.rt), Integer.valueOf(paramMemory.inst.rt), Integer.valueOf(paramWriteBack.inst.rt) });
+    pf("Rd      %20d%20d%20d%20d%20d\n", new Integer[] { Integer.valueOf(paramFetch.inst.rd), Integer.valueOf(paramDecode.inst.rd), Integer.valueOf(paramExecute.inst.rd), Integer.valueOf(paramMemory.inst.rd), Integer.valueOf(paramWriteBack.inst.rd) });
+    pf("RsV(hex)%20x%20x%20x%20x%20x\n", new Long[] { Long.valueOf(paramFetch.inst.rsValue), Long.valueOf(paramDecode.inst.rsValue), Long.valueOf(paramExecute.inst.rsValue), Long.valueOf(paramMemory.inst.rsValue), Long.valueOf(paramWriteBack.inst.rsValue) });
+    pf("RtV(hex)%20x%20x%20x%20x%20x\n", new Long[] { Long.valueOf(paramFetch.inst.rtValue), Long.valueOf(paramDecode.inst.rtValue), Long.valueOf(paramExecute.inst.rtValue), Long.valueOf(paramMemory.inst.rtValue), Long.valueOf(paramWriteBack.inst.rtValue) });
+    pf("RdV(hex)%20x%20x%20x%20x%20x\n", new Long[] { Long.valueOf(paramFetch.inst.rdValue), Long.valueOf(paramDecode.inst.rdValue), Long.valueOf(paramExecute.inst.rdValue), Long.valueOf(paramMemory.inst.rdValue), Long.valueOf(paramWriteBack.inst.rdValue) });
+    p(new String[] { ".........................." });
+  }
+  
+  private void set_support_mips_inst(HashMap<String, InstType> paramHashMap)
+  {
+    paramHashMap.put("add", new InstType(0, 31, 0));
+    paramHashMap.put("addi", new InstType(1, 34, 0));
+    paramHashMap.put("addiu", new InstType(1, 35, 0));
+    paramHashMap.put("addu", new InstType(0, 36, 0));
+    paramHashMap.put("and", new InstType(0, 37, 0));
+    paramHashMap.put("andi", new InstType(1, 38, 0));
+    paramHashMap.put("b", new InstType(3, 39, 0));
+    paramHashMap.put("bal", new InstType(4, 40, 0));
+    paramHashMap.put("beq", new InstType(5, 55, 0));
+    paramHashMap.put("bgez", new InstType(4, 58, 0));
+    paramHashMap.put("bgezal", new InstType(4, 59, 0));
+    paramHashMap.put("bgtz", new InstType(4, 64, 0));
+    paramHashMap.put("blez", new InstType(4, 67, 0));
+    paramHashMap.put("bltz", new InstType(4, 70, 0));
+    paramHashMap.put("bltzal", new InstType(4, 71, 0));
+    paramHashMap.put("bne", new InstType(5, 76, 0));
+    paramHashMap.put("break", new InstType(12, 79, 0));
+    paramHashMap.put("div", new InstType(6, 109, 0));
+    paramHashMap.put("divu", new InstType(6, 112, 0));
+    paramHashMap.put("eret", new InstType(8, 113, 0));
+    paramHashMap.put("j", new InstType(3, 115, 0));
+    paramHashMap.put("jal", new InstType(3, 116, 0));
+    paramHashMap.put("jalr", new InstType(9, 117, 0));
+    paramHashMap.put("jr", new InstType(10, 119, 0));
+    paramHashMap.put("lb", new InstType(2, 121, 0));
+    paramHashMap.put("lbu", new InstType(2, 122, 0));
+    paramHashMap.put("lh", new InstType(2, 125, 0));
+    paramHashMap.put("lhu", new InstType(2, 126, 0));
+    paramHashMap.put("ll", new InstType(2, 127, 0));
+    paramHashMap.put("lui", new InstType(11, 129, 0));
+    paramHashMap.put("lw", new InstType(2, 130, 0));
+    paramHashMap.put("mfc0", new InstType(7, 143, 0));
+    paramHashMap.put("movn", new InstType(0, 152, 0));
+    paramHashMap.put("movz", new InstType(0, 158, 0));
+    paramHashMap.put("mtc0", new InstType(7, 163, 0));
+    paramHashMap.put("mul", new InstType(0, 169, 0));
+    paramHashMap.put("nop", new InstType(8, 174, 0));
+    paramHashMap.put("nor", new InstType(0, 175, 0));
+    paramHashMap.put("or", new InstType(0, 176, 0));
+    paramHashMap.put("ori", new InstType(1, 177, 0));
+    paramHashMap.put("sb", new InstType(2, 185, 0));
+    paramHashMap.put("sh", new InstType(2, 192, 0));
+    paramHashMap.put("sll", new InstType(12, 193, 0));
+    paramHashMap.put("sllv", new InstType(13, 194, 0));
+    paramHashMap.put("slt", new InstType(0, 195, 0));
+    paramHashMap.put("slti", new InstType(1, 196, 0));
+    paramHashMap.put("sltiu", new InstType(1, 197, 0));
+    paramHashMap.put("sltu", new InstType(0, 198, 0));
+    paramHashMap.put("sra", new InstType(12, 200, 0));
+    paramHashMap.put("srav", new InstType(13, 201, 0));
+    paramHashMap.put("srl", new InstType(12, 202, 0));
+    paramHashMap.put("srlv", new InstType(13, 203, 0));
+    paramHashMap.put("sub", new InstType(0, 205, 0));
+    paramHashMap.put("subu", new InstType(0, 207, 0));
+    paramHashMap.put("sw", new InstType(2, 208, 0));
+    paramHashMap.put("syscall", new InstType(8, 219, 0));
+    paramHashMap.put("teq", new InstType(6, 220, 0));
+    paramHashMap.put("teqi", new InstType(4, 221, 0));
+    paramHashMap.put("tge", new InstType(6, 222, 0));
+    paramHashMap.put("tgei", new InstType(4, 223, 0));
+    paramHashMap.put("tgeiu", new InstType(4, 224, 0));
+    paramHashMap.put("tgeu", new InstType(6, 225, 0));
+    paramHashMap.put("tlt", new InstType(6, 233, 0));
+    paramHashMap.put("tlti", new InstType(4, 234, 0));
+    paramHashMap.put("tltiu", new InstType(4, 235, 0));
+    paramHashMap.put("tltu", new InstType(6, 236, 0));
+    paramHashMap.put("tne", new InstType(6, 237, 0));
+    paramHashMap.put("tnei", new InstType(4, 238, 0));
+    paramHashMap.put("xor", new InstType(0, 243, 0));
+    paramHashMap.put("xori", new InstType(1, 244, 0));
+  }
+  
+  private int get_inst_type(String paramString)
+  {
+    InstType localInstType = (InstType)m.get(paramString.toLowerCase());
+    return localInstType == null ? -1 : localInstType.type;
+  }
+  
+  private int get_inst_opcode(String paramString)
+  {
+    InstType localInstType = (InstType)m.get(paramString.toLowerCase());
+    return localInstType == null ? -1 : localInstType.opcode;
+  }
+  
+  private int sign_extend(int paramInt1, int paramInt2)
+  {
+    paramInt1 <<= 32 - paramInt2;
+    paramInt1 >>= 32 - paramInt2;
+    return paramInt1;
+  }
+  
+  private class Stage
+  {
+    protected SPIM.Instruction inst = new SPIM.Instruction(SPIM.this, "NOP");
+    protected int PC = -4;
+    
+    public Stage() {}
+  }
+  
+  private class Fetch
+    extends SPIM.Stage
+  {
+    public boolean stall = false;
+    
+    public Fetch()
+    {
+      super();
+      this.PC = -4;
+    }
+    
+    public void step(SPIM.Instruction paramInstruction, SPIMData paramSPIMData, SPIM.Decode paramDecode)
+    {
+      if (!this.stall)
+      {
+        if (paramDecode.branch_taken)
+        {
+          SPIM.p(new String[] { "branch_taken!" });
+          this.PC = paramDecode.btarget;
+        }
+        else if (paramDecode.jump)
+        {
+          if (SPIM.execute.inst.is_ji())
+          {
+            this.PC = paramDecode.jitarget;
+            SPIM.p(new String[] { "branch to jitarget:" + Integer.toHexString(paramDecode.jitarget) });
+          }
+          else if (SPIM.execute.inst.is_jr())
+          {
+            this.PC = paramDecode.jrtarget;
+            SPIM.p(new String[] { "branch to jrtarget:" + Integer.toHexString(paramDecode.jrtarget) });
+          }
+        }
+        else
+        {
+          this.PC += 4;
+          SPIM.p(new String[] { "PC increment " + Integer.toHexString(this.PC) });
+        }
+        if (paramInstruction.valid())
+        {
+          this.inst = paramInstruction;
+          paramInstruction.flush = false;
+        }
+      }
+      else
+      {
+        SPIM.p(new String[] { "pc = decode pc" });
+        this.PC = paramDecode.PC;
+        if (paramInstruction.valid())
+        {
+          this.inst = paramInstruction;
+          paramInstruction.flush = false;
+        }
+      }
+    }
+  }
+  
+  private class Decode
+    extends SPIM.Stage
+  {
+    private Vector<Integer> hazardList = new Vector(3);
+    private SPIM.Instruction instructionSave = new SPIM.Instruction(SPIM.this, "NOP");
+    private int savePC;
+    private boolean isStall;
+    public boolean nop;
+    public int btarget;
+    public int jitarget;
+    public int jrtarget;
+    public boolean branch_taken;
+    public boolean jump;
+    private boolean rs_ex_hazard;
+    private boolean rt_ex_hazard;
+    private boolean rs_mem_hazard;
+    private boolean rt_mem_hazard;
+    private boolean rs_wb_hazard;
+    private boolean rt_wb_hazard;
+    private boolean ld_ex_load_use;
+    private boolean ld_mem_load_use;
+    
+    public Decode()
+    {
+      super();
+      this.hazardList.addElement(new Integer(0));
+      this.hazardList.addElement(new Integer(0));
+      this.hazardList.addElement(new Integer(0));
+    }
+    
+    public void step(SPIMData paramSPIMData, SPIM.Memory paramMemory, SPIM.WriteBack paramWriteBack, SPIM.Fetch paramFetch, SPIM.Execute paramExecute)
+    {
+      this.rs_ex_hazard = false;
+      this.rt_ex_hazard = false;
+      this.rs_mem_hazard = false;
+      this.rt_mem_hazard = false;
+      this.rs_wb_hazard = false;
+      this.rt_wb_hazard = false;
+      if ((!paramExecute.inst.flush) && (this.inst.rs == ((Integer)this.hazardList.elementAt(0)).intValue()) && (((Integer)this.hazardList.elementAt(0)).intValue() != 0)) {
+        this.rs_ex_hazard = true;
+      }
+      if ((!paramExecute.inst.flush) && (this.inst.rt == ((Integer)this.hazardList.elementAt(0)).intValue()) && (((Integer)this.hazardList.elementAt(0)).intValue() != 0)) {
+        this.rt_ex_hazard = true;
+      }
+      if ((!paramMemory.inst.flush) && (this.inst.rs == ((Integer)this.hazardList.elementAt(1)).intValue()) && (((Integer)this.hazardList.elementAt(1)).intValue() != 0)) {
+        this.rs_mem_hazard = true;
+      }
+      if ((!paramMemory.inst.flush) && (this.inst.rt == ((Integer)this.hazardList.elementAt(1)).intValue()) && (((Integer)this.hazardList.elementAt(1)).intValue() != 0)) {
+        this.rt_mem_hazard = true;
+      }
+      if ((!paramWriteBack.inst.flush) && (this.inst.rs == ((Integer)this.hazardList.elementAt(2)).intValue()) && (((Integer)this.hazardList.elementAt(2)).intValue() != 0)) {
+        this.rs_wb_hazard = true;
+      }
+      if ((!paramWriteBack.inst.flush) && (this.inst.rt == ((Integer)this.hazardList.elementAt(2)).intValue()) && (((Integer)this.hazardList.elementAt(2)).intValue() != 0)) {
+        this.rt_wb_hazard = true;
+      }
+      this.hazardList.setElementAt(this.hazardList.elementAt(1), 2);
+      this.hazardList.setElementAt(this.hazardList.elementAt(0), 1);
+      this.hazardList.setElementAt(new Integer(this.inst.rd), 0);
+      if (paramFetch.stall)
+      {
+        this.instructionSave = this.inst;
+        this.savePC = this.PC;
+        this.isStall = true;
+        this.inst = new SPIM.Instruction(SPIM.this, "NOP");
+        this.inst.rsValue = 0L;
+        this.inst.rtValue = 0L;
+        this.inst.rdValue = 0L;
+      }
+      else if (this.isStall)
+      {
+        this.isStall = false;
+        this.inst = this.instructionSave;
+        this.PC = this.savePC;
+      }
+    }
+    
+    public void step_level(SPIMData paramSPIMData, SPIM.Memory paramMemory, SPIM.WriteBack paramWriteBack, SPIM.Fetch paramFetch, SPIM.Execute paramExecute)
+    {
+      SPIM.p(new String[] { "---step level---" });
+      if (SPIM.decode.nop)
+      {
+        this.inst = new SPIM.Instruction(SPIM.this, "NOP");
+        this.inst.rsValue = 0L;
+        this.inst.rtValue = 0L;
+      }
+      if (this.inst.opcode == 143)
+      {
+        switch (this.inst.rd)
+        {
+        case 8: 
+          this.inst.rdValue = paramSPIMData.regs[34].toIntValue();
+          break;
+        case 12: 
+          this.inst.rdValue = paramSPIMData.regs[35].toIntValue();
+          break;
+        case 13: 
+          this.inst.rdValue = paramSPIMData.regs[36].toIntValue();
+          break;
+        case 14: 
+          this.inst.rdValue = paramSPIMData.regs[37].toIntValue();
+        }
+        return;
+      }
+      if (this.rs_ex_hazard)
+      {
+        this.inst.rsValue = paramExecute.inst.rdValue;
+      }
+      else if (this.rs_mem_hazard)
+      {
+        this.inst.rsValue = paramMemory.inst.rdValue;
+        SPIM.p(new String[] { "forwarded rsV with rdValue 0x" + Long.toHexString(paramMemory.inst.rdValue) });
+      }
+      else if (this.rs_wb_hazard)
+      {
+        this.inst.rsValue = paramWriteBack.inst.rdValue;
+      }
+      else
+      {
+        localValue = paramSPIMData.regs[this.inst.rs];
+        this.inst.rsValue = localValue.toIntValue();
+        SPIM.p(new String[] { "load rsV=" + Long.toHexString(this.inst.rsValue) });
+      }
+      if (this.rt_ex_hazard)
+      {
+        this.inst.rtValue = paramExecute.inst.rdValue;
+      }
+      else if (this.rt_mem_hazard)
+      {
+        this.inst.rtValue = paramMemory.inst.rdValue;
+      }
+      else if (this.rt_wb_hazard)
+      {
+        this.inst.rtValue = paramWriteBack.inst.rdValue;
+      }
+      else
+      {
+        if (this.inst.is_immediate())
+        {
+          this.inst.rtValue = this.inst.immediate;
+        }
+        else
+        {
+          localValue = paramSPIMData.regs[this.inst.rt];
+          this.inst.rtValue = localValue.toIntValue();
+        }
+        SPIM.p(new String[] { "load rtV=" + Long.toHexString(this.inst.rtValue) });
+      }
+      Value localValue = paramSPIMData.regs[this.inst.rd];
+      this.inst.rdValue = localValue.toIntValue();
+      SPIM.p(new String[] { "hazard: rs - ex, mem, wb: " + this.rs_ex_hazard + " " + this.rs_mem_hazard + " " + this.rs_wb_hazard });
+      SPIM.p(new String[] { "hazard: rt - ex, mem, wb: " + this.rt_ex_hazard + " " + this.rt_mem_hazard + " " + this.rt_wb_hazard });
+      branch_calc();
+      jump_calc();
+    }
+    
+    private void branch_calc()
+    {
+      int i = SPIM.this.sign_extend(this.inst.immediate, 18);
+      this.btarget = (this.PC + i);
+      switch (this.inst.opcode)
+      {
+      case 39: 
+        this.branch_taken = true;
+        break;
+      case 40: 
+        this.branch_taken = true;
+        this.inst.rd = 31;
+        this.inst.rdValue = (this.PC + 8);
+        break;
+      case 55: 
+        this.branch_taken = (this.inst.rsValue == this.inst.rtValue);
+        break;
+      case 58: 
+        this.branch_taken = (this.inst.rsValue >= 0L);
+        break;
+      case 64: 
+        this.branch_taken = (this.inst.rsValue > 0L);
+        break;
+      case 67: 
+        this.branch_taken = (this.inst.rsValue <= 0L);
+        break;
+      case 70: 
+        this.branch_taken = (this.inst.rsValue < 0L);
+        break;
+      case 76: 
+        this.branch_taken = (this.inst.rsValue != this.inst.rtValue);
+        break;
+      default: 
+        this.branch_taken = false;
+        this.btarget = 0;
+      }
+      SPIM.p(new String[] { "branch_taken: " + this.branch_taken + " " + Integer.toHexString(this.btarget) });
+    }
+    
+    private void jump_calc()
+    {
+      switch (this.inst.opcode)
+      {
+      case 115: 
+        this.jitarget = (this.PC & 0xF0000000 | this.inst.immediate);
+        this.jump = true;
+        SPIM.p(new String[] { "jitarget: " + Integer.toHexString(this.jitarget) });
+        break;
+      case 116: 
+        this.jitarget = (this.PC & 0xF0000000 | this.inst.immediate << 2);
+        this.inst.rd = 31;
+        this.inst.rdValue = (this.PC + 8);
+        this.jump = true;
+        SPIM.p(new String[] { "jitarget: " + Integer.toHexString(this.jitarget) });
+        break;
+      case 117: 
+        this.jrtarget = ((int)(this.inst.rsValue & 0xFFFFFFFF));
+        this.inst.rdValue = (this.PC + 8);
+        this.jump = true;
+        SPIM.p(new String[] { "jrtarget: " + Integer.toHexString(this.jrtarget) });
+        break;
+      case 119: 
+        this.jrtarget = ((int)(this.inst.rsValue & 0xFFFFFFFF));
+        this.jump = true;
+        SPIM.p(new String[] { "jrtarget: " + Integer.toHexString(this.jrtarget) });
+        break;
+      case 118: 
+      default: 
+        this.jump = false;
+        this.jitarget = 0;
+        this.jrtarget = 0;
+      }
+    }
+  }
+  
+  private class Execute
+    extends SPIM.Stage
+  {
+    public Execute()
+    {
+      super();
+    }
+    
+    public void step(SPIMData paramSPIMData, SPIM.Fetch paramFetch, SPIM.Decode paramDecode)
+    {
+      switch (this.inst.opcode)
+      {
+      case 31: 
+        this.inst.rdValue = (this.inst.rsValue + this.inst.rtValue);
+        break;
+      case 34: 
+        this.inst.immediate <<= 16;
+        this.inst.immediate >>= 16;
+        this.inst.rtValue = (this.inst.rsValue + this.inst.immediate);
+        this.inst.rdValue = this.inst.rtValue;
+        break;
+      case 35: 
+        this.inst.immediate <<= 16;
+        this.inst.immediate >>= 16;
+        this.inst.rtValue = (this.inst.rsValue + this.inst.immediate);
+        this.inst.rdValue = this.inst.rtValue;
+        break;
+      case 36: 
+        this.inst.rdValue = (this.inst.rsValue + this.inst.rtValue);
+        break;
+      case 37: 
+        this.inst.rdValue = (this.inst.rsValue & this.inst.rtValue);
+        break;
+      case 38: 
+        this.inst.rtValue = (this.inst.rsValue & this.inst.immediate);
+        this.inst.rdValue = this.inst.rtValue;
+        break;
+      case 39: 
+        break;
+      case 40: 
+        break;
+      case 55: 
+        break;
+      case 59: 
+        break;
+      case 64: 
+        break;
+      case 67: 
+        break;
+      case 70: 
+        break;
+      case 71: 
+        break;
+      case 76: 
+        paramFetch.inst.flush = true;
+        paramDecode.inst.flush = false;
+        break;
+      case 79: 
+        break;
+      case 95: 
+        break;
+      case 99: 
+        break;
+      case 103: 
+        break;
+      case 109: 
+        this.inst.rdValue = ((this.inst.rsValue & 0xFF) / (this.inst.rtValue & 0xFF));
+        break;
+      case 112: 
+        this.inst.rdValue = ((this.inst.rsValue & 0xFF) / (this.inst.rtValue & 0xFF));
+        break;
+      case 113: 
+        paramFetch.PC = paramSPIMData.regs[37].toIntValue();
+        paramFetch.inst.flush = true;
+        paramDecode.inst.flush = true;
+        break;
+      case 115: 
+        paramFetch.PC = ((int)(this.inst.immediate & 0xFFFFFFFF));
+        paramFetch.inst.flush = true;
+        paramDecode.inst.flush = false;
+        break;
+      case 116: 
+        this.inst.rd = 31;
+        this.inst.rdValue = (this.PC + 8);
+        paramFetch.PC = ((int)(this.inst.immediate & 0xFFFFFFFF));
+        paramFetch.inst.flush = true;
+        paramDecode.inst.flush = false;
+        break;
+      case 117: 
+        this.inst.rdValue = (this.PC + 8);
+        paramFetch.PC = ((int)(this.inst.rsValue & 0xFFFFFFFF));
+        paramFetch.inst.flush = true;
+        paramDecode.inst.flush = false;
+        break;
+      case 119: 
+        paramFetch.PC = ((int)(this.inst.rsValue & 0xFFFFFFFF));
+        paramFetch.inst.flush = true;
+        paramDecode.inst.flush = false;
+        break;
+      case 121: 
+        break;
+      case 122: 
+        break;
+      case 125: 
+        break;
+      case 126: 
+        break;
+      case 127: 
+        break;
+      case 129: 
+        this.inst.rtValue = (this.inst.immediate << 16);
+        this.inst.rdValue = this.inst.rtValue;
+        break;
+      case 130: 
+        break;
+      case 143: 
+        SPIM.p(new String[] { "handle MFC0" });
+        break;
+      case 152: 
+        if (this.inst.rtValue != 0L) {
+          this.inst.rdValue = this.inst.rsValue;
+        }
+        break;
+      case 158: 
+        if (this.inst.rtValue == 0L) {
+          this.inst.rdValue = this.inst.rsValue;
+        }
+        this.inst.rdValue = this.inst.rdValue;
+        break;
+      case 163: 
+        break;
+      case 169: 
+        this.inst.rdValue = ((this.inst.rsValue & 0xFF) * (this.inst.rtValue & 0xFF));
+        break;
+      case 174: 
+        break;
+      case 175: 
+        this.inst.rdValue = ((this.inst.rsValue | this.inst.rtValue) ^ 0xFFFFFFFFFFFFFFFF);
+        break;
+      case 176: 
+        this.inst.rdValue = (this.inst.rsValue | this.inst.rtValue);
+        break;
+      case 177: 
+        this.inst.rtValue = (this.inst.rsValue | this.inst.immediate);
+        this.inst.rdValue = this.inst.rtValue;
+        break;
+      case 185: 
+        break;
+      case 192: 
+        break;
+      case 193: 
+        this.inst.rdValue = (this.inst.rtValue << this.inst.immediate);
+        break;
+      case 194: 
+        this.inst.rdValue = (this.inst.rtValue << (int)(this.inst.rsValue & 0x1F));
+        break;
+      case 195: 
+        this.inst.rdValue = (this.inst.rsValue < this.inst.rtValue ? 1L : 0L);
+        break;
+      case 196: 
+        this.inst.immediate <<= 16;
+        this.inst.immediate >>= 16;
+        this.inst.rtValue = (this.inst.rsValue < this.inst.immediate ? 1L : 0L);
+        this.inst.rdValue = this.inst.rtValue;
+        break;
+      case 197: 
+        this.inst.immediate <<= 16;
+        this.inst.immediate >>= 16;
+        this.inst.rtValue = ((this.inst.rsValue & 0xFFFFFFFF) < (this.inst.immediate & 0xFFFFFFFF) ? 1L : 0L);
+        this.inst.rdValue = this.inst.rtValue;
+        break;
+      case 198: 
+        this.inst.rdValue = ((this.inst.rsValue & 0xFFFFFFFF) < (this.inst.rtValue & 0xFFFFFFFF) ? 1L : 0L);
+        break;
+      case 200: 
+        this.inst.rdValue = (this.inst.rtValue >> this.inst.immediate);
+        break;
+      case 201: 
+        this.inst.rdValue = (this.inst.rtValue >> (int)(this.inst.rsValue & 0x1F));
+        break;
+      case 202: 
+        this.inst.rtValue <<= 32;
+        this.inst.rtValue >>>= this.inst.immediate;
+        this.inst.rtValue >>= 32;
+        this.inst.rdValue = this.inst.rtValue;
+        break;
+      case 203: 
+        this.inst.rdValue = ((this.inst.rtValue & 0xFFFFFFFF) >>> (int)(this.inst.rsValue & 0x1F));
+        break;
+      case 205: 
+        this.inst.rdValue = (this.inst.rsValue - this.inst.rtValue);
+        break;
+      case 207: 
+        this.inst.rdValue = (this.inst.rsValue - this.inst.rtValue);
+        break;
+      case 208: 
+        this.inst.rdValue = this.inst.rtValue;
+        break;
+      case 219: 
+        break;
+      case 220: 
+        break;
+      case 221: 
+        break;
+      case 222: 
+        break;
+      case 223: 
+        break;
+      case 224: 
+        break;
+      case 225: 
+        break;
+      case 233: 
+        break;
+      case 234: 
+        break;
+      case 235: 
+        break;
+      case 236: 
+        break;
+      case 237: 
+        break;
+      case 238: 
+        break;
+      case 243: 
+        this.inst.rdValue = (this.inst.rsValue ^ this.inst.rtValue);
+        break;
+      case 244: 
+        this.inst.rtValue = (this.inst.rsValue ^ this.inst.immediate);
+        this.inst.rdValue = this.inst.rtValue;
+      }
+    }
+  }
+  
+  private class Memory
+    extends SPIM.Stage
+  {
+    private int memAddr = -1;
+    
+    public Memory()
+    {
+      super();
+    }
+    
+    public void step(InstanceState paramInstanceState)
+    {
+      int i = 15;
+      int j = 0;
+      int k = 0;
+      long l = 0L;
+      if (this.inst.flush == true)
+      {
+        this.inst.wbFlush = true;
+        return;
+      }
+      this.inst.wbFlush = false;
+      if (is_mem_write())
+      {
+        this.memAddr = ((int)((this.inst.rsValue & 0xFFFFFFFF) + this.inst.immediate));
+        if (is_byte_access())
+        {
+          SPIM.p(new String[] { "byte access" });
+          l = (this.inst.rtValue & 0xFF) << 8 * (this.memAddr & 0x3);
+          i = 1 << (this.memAddr & 0x3);
+        }
+        else if (is_half_word_access())
+        {
+          SPIM.p(new String[] { "half word access" });
+          l = (this.inst.rtValue & 0xFFFF) << 16 * (this.memAddr & 0x3);
+          i = 3 << (this.memAddr & 0x3);
+        }
+        else
+        {
+          SPIM.p(new String[] { "word access" });
+          l = this.inst.rtValue & 0xFFFFFFFF;
+          i = 15;
+        }
+        SPIM.p(new String[] { "tomem: " + Long.toHexString(l) });
+        if (is_byte_access()) {
+          this.memAddr >>= 2;
+        } else if (is_half_word_access()) {
+          this.memAddr >>= 1;
+        }
+        paramInstanceState.setPort(3, Value.createKnown(BitWidth.create(24), this.memAddr), 1);
+        paramInstanceState.setPort(4, Value.createKnown(BitWidth.create(32), (int)l), 1);
+        paramInstanceState.setPort(6, Value.createKnown(BitWidth.create(1), 1), 20);
+        paramInstanceState.setPort(8, Value.createKnown(BitWidth.create(1), 0), 20);
+        paramInstanceState.setPort(7, Value.createKnown(BitWidth.create(4), i), 10);
+      }
+      else if (is_mem_read())
+      {
+        i = 15;
+        SPIM.p(new String[] { "read memory!" });
+        if (is_byte_access())
+        {
+          this.memAddr = ((int)(this.inst.rsValue + ((this.inst.immediate & 0xFFFFFFFC) << 48 >> 48)));
+        }
+        else if (is_half_word_access())
+        {
+          this.memAddr = ((int)(this.inst.rsValue + ((this.inst.immediate & 0xFFFFFFFE) << 48 >> 48)));
+        }
+        else
+        {
+          this.memAddr = ((int)(this.inst.rsValue + (this.inst.immediate << 48 >> 48)));
+          SPIM.p(new String[] { "word access: " + Integer.toHexString(this.memAddr) });
+        }
+        paramInstanceState.setPort(3, Value.createKnown(BitWidth.create(24), this.memAddr), 1);
+        paramInstanceState.setPort(6, Value.createKnown(BitWidth.create(1), 0), 1);
+        paramInstanceState.setPort(8, Value.createKnown(BitWidth.create(1), 1), 1);
+        paramInstanceState.setPort(7, Value.createKnown(BitWidth.create(4), i), 1);
+      }
+      else
+      {
+        paramInstanceState.setPort(6, Value.createKnown(BitWidth.create(1), 0), 0);
+        paramInstanceState.setPort(8, Value.createKnown(BitWidth.create(1), 0), 0);
+        paramInstanceState.setPort(7, Value.createKnown(BitWidth.create(4), 0), 0);
+      }
+    }
+    
+    public void step_level(InstanceState paramInstanceState)
+    {
+      int i = 0;
+      long l = 0L;
+      if ((this.memAddr == SPIM.wb.inst.rsValue) && (SPIM.wb.inst.opcode == 208)) {
+        i = 1;
+      }
+      if (is_mem_read())
+      {
+        if (i != 0) {
+          l = SPIM.wb.inst.rtValue;
+        } else {
+          l = paramInstanceState.getPortValue(5).toIntValue();
+        }
+        if (is_byte_access())
+        {
+          l &= 255 << 8 * (this.inst.immediate & 0x3);
+          if (is_zero_extend())
+          {
+            l >>= 8 * (this.inst.immediate & 0x3);
+          }
+          else
+          {
+            l <<= 56 - 8 * (this.inst.immediate & 0x3);
+            l >>= 56 - 8 * (this.inst.immediate & 0x3);
+          }
+        }
+        else if (is_half_word_access())
+        {
+          l &= 65535 << 16 * (this.inst.immediate & 0x3);
+          if (is_zero_extend())
+          {
+            l >>= 16 * ((this.inst.immediate & 0x3) >> 1);
+          }
+          else
+          {
+            l <<= 48 - 16 * ((this.inst.immediate & 0x3) >> 1);
+            l >>= 48 - 16 * ((this.inst.immediate & 0x3) >> 1);
+          }
+        }
+        this.inst.rtValue = l;
+      }
+    }
+    
+    private boolean is_mem_write()
+    {
+      return (this.inst.opcode == 185) || (this.inst.opcode == 192) || (this.inst.opcode == 208);
+    }
+    
+    private boolean is_mem_read()
+    {
+      return (this.inst.opcode == 121) || (this.inst.opcode == 122) || (this.inst.opcode == 125) || (this.inst.opcode == 126) || (this.inst.opcode == 130);
+    }
+    
+    private boolean is_byte_access()
+    {
+      return (this.inst.opcode == 121) || (this.inst.opcode == 122) || (this.inst.opcode == 185);
+    }
+    
+    private boolean is_half_word_access()
+    {
+      return (this.inst.opcode == 125) || (this.inst.opcode == 126) || (this.inst.opcode == 192);
+    }
+    
+    private boolean is_zero_extend()
+    {
+      return (this.inst.opcode == 122) || (this.inst.opcode == 126);
+    }
+  }
+  
+  private class WriteBack
+    extends SPIM.Stage
+  {
+    private boolean done = false;
+    
+    public WriteBack()
+    {
+      super();
+    }
+    
+    public void step(SPIMData paramSPIMData, boolean paramBoolean)
+    {
+      Value localValue;
+      switch (this.inst.optype)
+      {
+      case 0: 
+      case 3: 
+      case 9: 
+      case 12: 
+      case 13: 
+        if ((this.inst.rd != 0) && (!this.inst.flush)) {
+          if (this.inst.rd < 32)
+          {
+            localValue = Value.createKnown(BitWidth.create(32), (int)this.inst.rdValue);
+            paramSPIMData.regs[this.inst.rd] = localValue;
+            SPIM.p(new String[] { "Reg[" + this.inst.rd + "]=" + Long.toHexString(this.inst.rdValue & 0xFFFFFFFF) });
+          }
+          else
+          {
+            throw new IllegalArgumentException("Write address invalid: email hwang@cs and tell him!");
+          }
+        }
+        break;
+      case 1: 
+      case 2: 
+      case 11: 
+        if ((this.inst.rt != 0) && (!this.inst.flush) && (this.inst.rt < 32))
+        {
+          localValue = Value.createKnown(BitWidth.create(32), (int)this.inst.rtValue);
+          paramSPIMData.regs[this.inst.rt] = localValue;
+          SPIM.p(new String[] { "Reg[" + this.inst.rt + "]=" + Long.toHexString(this.inst.rtValue & 0xFFFFFFFF) });
+        }
+        break;
+      case 7: 
+        if (this.inst.opcode == 163)
+        {
+          if ((this.inst.rt != 0) && (!this.inst.flush))
+          {
+            localValue = Value.createKnown(BitWidth.create(32), (int)this.inst.rtValue);
+            switch (this.inst.rd)
+            {
+            case 8: 
+              paramSPIMData.regs[34] = localValue;
+              break;
+            case 12: 
+              paramSPIMData.regs[35] = localValue;
+              break;
+            case 13: 
+              paramSPIMData.regs[36] = localValue;
+              break;
+            default: 
+              SPIM.p(new String[] { "nothing" });
+            }
+          }
+        }
+        else if ((this.inst.opcode == 143) && (this.inst.rd != 0) && (!this.inst.flush))
+        {
+          localValue = Value.createKnown(BitWidth.create(32), (int)this.inst.rdValue);
+          paramSPIMData.regs[this.inst.rt] = localValue;
+        }
+        break;
+      }
+    }
+  }
+  
+  private class ExceptionUnit
+  {
+    private boolean handle_exception = false;
+    
+    public ExceptionUnit() {}
+    
+    /* Error */
+    public void step(SPIM.Fetch arg1, SPIM.Decode arg2, SPIM.Execute arg3, SPIM.Memory arg4, SPIM.WriteBack arg5, InstanceState arg6, SPIMData arg7)
+    {
+      // Byte code:
+      //   0: aload 7
+      //   2: getfield 5	edu/cornell/cs3410/SPIMData:regs	[Lcom/cburch/logisim/data/Value;
+      //   5: bipush 35
+      //   7: aaload
+      //   8: invokevirtual 6	com/cburch/logisim/data/Value:toIntValue	()I
+      //   11: istore 8
+      //   13: iload 8
+      //   15: iconst_1
+      //   16: iand
+      //   17: dup
+      //   18: istore 8
+      //   20: istore 9
+      //   22: iload 9
+      //   24: ifle +34 -> 58
+      //   27: aload_0
+      //   28: aload 6
+      //   30: bipush 9
+      //   32: invokeinterface 7 2 0
+      //   37: invokevirtual 6	com/cburch/logisim/data/Value:toIntValue	()I
+      //   40: iconst_1
+      //   41: if_icmpeq +6 -> 47
+      //   44: goto +7 -> 51
+      //   47: iconst_1
+      //   48: goto +4 -> 52
+      //   51: iconst_0
+      //   52: putfield 4	edu/cornell/cs3410/SPIM$ExceptionUnit:handle_exception	Z
+      //   55: goto +8 -> 63
+      //   58: aload_0
+      //   59: iconst_0
+      //   60: putfield 4	edu/cornell/cs3410/SPIM$ExceptionUnit:handle_exception	Z
+      //   63: aload_0
+      //   64: getfield 4	edu/cornell/cs3410/SPIM$ExceptionUnit:handle_exception	Z
+      //   67: ifeq +120 -> 187
+      //   70: aload 7
+      //   72: getfield 5	edu/cornell/cs3410/SPIMData:regs	[Lcom/cburch/logisim/data/Value;
+      //   75: bipush 37
+      //   77: bipush 32
+      //   79: invokestatic 8	com/cburch/logisim/data/BitWidth:create	(I)Lcom/cburch/logisim/data/BitWidth;
+      //   82: aload_1
+      //   83: getfield 9	edu/cornell/cs3410/SPIM$Fetch:PC	I
+      //   86: invokestatic 10	com/cburch/logisim/data/Value:createKnown	(Lcom/cburch/logisim/data/BitWidth;I)Lcom/cburch/logisim/data/Value;
+      //   89: aastore
+      //   90: iconst_1
+      //   91: anewarray 11	java/lang/String
+      //   94: dup
+      //   95: iconst_0
+      //   96: new 12	java/lang/StringBuilder
+      //   99: dup
+      //   100: invokespecial 13	java/lang/StringBuilder:<init>	()V
+      //   103: ldc 14
+      //   105: invokevirtual 15	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      //   108: iload 8
+      //   110: invokestatic 16	java/lang/Integer:toHexString	(I)Ljava/lang/String;
+      //   113: invokevirtual 15	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      //   116: invokevirtual 17	java/lang/StringBuilder:toString	()Ljava/lang/String;
+      //   119: aastore
+      //   120: invokestatic 18	edu/cornell/cs3410/SPIM:access$200	([Ljava/lang/Object;)V
+      //   123: iload 8
+      //   125: bipush -2
+      //   127: iand
+      //   128: istore 8
+      //   130: iconst_1
+      //   131: anewarray 11	java/lang/String
+      //   134: dup
+      //   135: iconst_0
+      //   136: new 12	java/lang/StringBuilder
+      //   139: dup
+      //   140: invokespecial 13	java/lang/StringBuilder:<init>	()V
+      //   143: ldc 14
+      //   145: invokevirtual 15	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      //   148: iload 8
+      //   150: invokestatic 16	java/lang/Integer:toHexString	(I)Ljava/lang/String;
+      //   153: invokevirtual 15	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      //   156: invokevirtual 17	java/lang/StringBuilder:toString	()Ljava/lang/String;
+      //   159: aastore
+      //   160: invokestatic 18	edu/cornell/cs3410/SPIM:access$200	([Ljava/lang/Object;)V
+      //   163: aload 7
+      //   165: getfield 5	edu/cornell/cs3410/SPIMData:regs	[Lcom/cburch/logisim/data/Value;
+      //   168: bipush 35
+      //   170: bipush 32
+      //   172: invokestatic 8	com/cburch/logisim/data/BitWidth:create	(I)Lcom/cburch/logisim/data/BitWidth;
+      //   175: iload 8
+      //   177: invokestatic 10	com/cburch/logisim/data/Value:createKnown	(Lcom/cburch/logisim/data/BitWidth;I)Lcom/cburch/logisim/data/Value;
+      //   180: aastore
+      //   181: aload_1
+      //   182: ldc 19
+      //   184: putfield 9	edu/cornell/cs3410/SPIM$Fetch:PC	I
+      //   187: return
+    }
+  }
+  
+  private class Staller
+  {
+    private boolean _id_ex_load_use = false;
+    private boolean id_ex_load_use = false;
+    private boolean id_mem_load_use = false;
+    
+    public Staller() {}
+    
+    public void step(SPIM.Fetch paramFetch, SPIM.Decode paramDecode, SPIM.Execute paramExecute, SPIM.Memory paramMemory)
+    {
+      this.id_ex_load_use = this._id_ex_load_use;
+      if (((paramDecode.inst.rs == paramExecute.inst.rd) || ((paramDecode.inst.rt == paramExecute.inst.rd) && (!paramDecode.inst.is_immediate()))) && (paramExecute.inst.is_load()) && (paramExecute.inst.rd != 0))
+      {
+        this._id_ex_load_use = true;
+        SPIM.p(new String[] { "staller: id_ex_load_use TRUE!" });
+      }
+      else
+      {
+        this._id_ex_load_use = false;
+      }
+      if (((paramDecode.inst.rs == paramMemory.inst.rd) || ((paramDecode.inst.rt == paramMemory.inst.rd) && (!paramDecode.inst.is_immediate()))) && (paramMemory.inst.is_load()) && (paramMemory.inst.rd != 0)) {
+        this.id_mem_load_use = true;
+      } else {
+        this.id_mem_load_use = false;
+      }
+      if ((this.id_ex_load_use) || (this.id_mem_load_use) || (this._id_ex_load_use))
+      {
+        SPIM.p(new String[] { "staller:" + this.id_ex_load_use + " " + this._id_ex_load_use + " " + this.id_mem_load_use });
+        paramFetch.stall = true;
+        paramDecode.nop = true;
+      }
+      else
+      {
+        paramFetch.stall = false;
+        paramDecode.nop = false;
+      }
+    }
+  }
+  
+  private class Instruction
+  {
+    public int opcode;
+    public int optype;
+    public int rs;
+    public int rt;
+    public int rd;
+    public int immediate;
+    public long rdValue;
+    public long rsValue;
+    public long rtValue;
+    public String instructionString;
+    private boolean ok;
+    public boolean flush;
+    public boolean wbFlush;
+    public boolean forwardRsFlag;
+    public boolean forwardRtFlag;
+    private boolean isImmediateInstruction;
+    
+    Instruction(String paramString)
+    {
+      StringTokenizer localStringTokenizer = new StringTokenizer(paramString, " ");
+      String str1 = "";
+      String str2 = "";
+      String str3 = "";
+      String str4 = "";
+      this.rdValue = 0L;
+      this.rsValue = 0L;
+      this.rtValue = 0L;
+      this.isImmediateInstruction = false;
+      this.ok = true;
+      this.instructionString = paramString;
+      this.flush = false;
+      this.forwardRsFlag = false;
+      this.forwardRtFlag = false;
+      if (paramString.equals("NOP"))
+      {
+        this.instructionString = "NOP";
+        this.rd = 0;
+        this.rt = 0;
+        this.rs = 0;
+        this.immediate = 0;
+        this.opcode = 0;
+        return;
+      }
+      try
+      {
+        str1 = localStringTokenizer.nextToken();
+        this.optype = SPIM.this.get_inst_type(str1);
+        if (localStringTokenizer.hasMoreTokens()) {
+          str2 = localStringTokenizer.nextToken();
+        }
+        if (localStringTokenizer.hasMoreTokens()) {
+          str3 = localStringTokenizer.nextToken();
+        }
+        if (localStringTokenizer.hasMoreTokens()) {
+          str4 = localStringTokenizer.nextToken();
+        }
+        switch (this.optype)
+        {
+        case 0: 
+          this.rd = Integer.parseInt(str2.substring(1));
+          this.rs = Integer.parseInt(str3.substring(1));
+          this.rt = Integer.parseInt(str4.substring(1));
+          break;
+        case 1: 
+          this.rt = Integer.parseInt(str2.substring(1));
+          this.rs = Integer.parseInt(str3.substring(1));
+          this.rd = this.rt;
+          this.isImmediateInstruction = true;
+          this.immediate = Integer.parseInt(str4.substring(2), 16);
+          break;
+        case 2: 
+          this.rt = Integer.parseInt(str2.substring(1));
+          this.rs = Integer.parseInt(str3.substring(str3.indexOf("$") + 1, str3.indexOf(")")));
+          this.immediate = Integer.parseInt(str3.substring(2, str3.indexOf("(")), 16);
+          this.rd = this.rt;
+          break;
+        case 3: 
+          this.immediate = Integer.parseInt(str2.substring(2), 16);
+          break;
+        case 4: 
+          this.rs = Integer.parseInt(str2.substring(1));
+          this.immediate = Integer.parseInt(str3.substring(2), 16);
+          this.opcode = SPIM.this.get_inst_opcode(str1);
+          break;
+        case 5: 
+          this.rt = Integer.parseInt(str2.substring(1));
+          this.rs = Integer.parseInt(str3.substring(1));
+          this.immediate = Integer.parseInt(str4.substring(2), 16);
+          break;
+        case 6: 
+          this.rs = Integer.parseInt(str2.substring(1));
+          this.rt = Integer.parseInt(str3.substring(1));
+          break;
+        case 7: 
+          this.rt = Integer.parseInt(str2.substring(1));
+          this.rd = Integer.parseInt(str3.substring(1));
+          break;
+        case 8: 
+          break;
+        case 9: 
+          if (str3 != "")
+          {
+            this.rd = Integer.parseInt(str2.substring(1));
+            this.rs = Integer.parseInt(str3.substring(1));
+          }
+          else
+          {
+            this.rs = Integer.parseInt(str2.substring(1));
+            this.rd = 31;
+          }
+          break;
+        case 10: 
+          this.rs = Integer.parseInt(str2.substring(1));
+          break;
+        case 11: 
+          this.rt = Integer.parseInt(str2.substring(1));
+          this.rd = this.rt;
+          this.isImmediateInstruction = true;
+          this.immediate = Integer.parseInt(str3.substring(2), 16);
+          break;
+        case 12: 
+          this.rd = Integer.parseInt(str2.substring(1));
+          this.rt = Integer.parseInt(str3.substring(1));
+          this.immediate = Integer.parseInt(str4);
+          break;
+        case 13: 
+          this.rd = Integer.parseInt(str2.substring(1));
+          this.rt = Integer.parseInt(str3.substring(1));
+          this.rs = Integer.parseInt(str4.substring(1));
+          break;
+        default: 
+          this.ok = false;
+          break;
+        }
+        this.opcode = SPIM.this.get_inst_opcode(str1);
+      }
+      catch (NumberFormatException localNumberFormatException)
+      {
+        System.out.println(localNumberFormatException.toString());
+        this.ok = false;
+      }
+      catch (NoSuchElementException localNoSuchElementException)
+      {
+        System.out.println(localNoSuchElementException.toString());
+        this.ok = false;
+      }
+      catch (StringIndexOutOfBoundsException localStringIndexOutOfBoundsException)
+      {
+        System.out.println(localStringIndexOutOfBoundsException.toString());
+        this.ok = false;
+      }
+    }
+    
+    public boolean valid()
+    {
+      return this.ok;
+    }
+    
+    public boolean is_immediate()
+    {
+      return this.isImmediateInstruction;
+    }
+    
+    public boolean is_load()
+    {
+      return (this.opcode == 121) || (this.opcode == 122) || (this.opcode == 125) || (this.opcode == 126) || (this.opcode == 130);
+    }
+    
+    public boolean is_ji()
+    {
+      return (this.opcode == 115) || (this.opcode == 116);
+    }
+    
+    public boolean is_jr()
+    {
+      return (this.opcode == 117) || (this.opcode == 119);
+    }
+    
+    public String toString()
+    {
+      return this.instructionString;
+    }
+  }
+  
+  private class InstType
+  {
+    public int type;
+    public int opcode;
+    public int supported;
+    
+    InstType(int paramInt1, int paramInt2, int paramInt3)
+    {
+      this.type = paramInt1;
+      this.opcode = paramInt2;
+      this.supported = paramInt3;
+    }
+  }
+}
