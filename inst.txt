@@ -7,7 +7,7 @@ Op: Opcode
 S: Set conditional flags
 ST = Shift Type (00 = LSL, 01 = LSR, 10 = ASR, 11 = RSR)
 
-DP (Binary) Format: INST rd, rm, rn
+DP (Binary) Format: INST rd, rn, rm
 DP (Unary) Format: INST rd, rm 	  		# with rn = 0
 
 
@@ -23,7 +23,6 @@ rsft   ST I  rm
 Operand2 for Immediate Shifts (bits 11 to 0):
 xxxxx xx 0 xxxx
 shift ST I  rm
-
 
 Data Transfer:
 xxxx xx  xxxxxx  xxxx xxxx xxxxxxxxxxxx
