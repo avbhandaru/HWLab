@@ -4,15 +4,14 @@
 
   <lib desc="#Wiring" name="0">
     <tool name="Splitter">
-      <a name="facing" val="west"/>
       <a name="fanout" val="4"/>
-      <a name="incoming" val="4"/>
+      <a name="incoming" val="1"/>
     </tool>
     <tool name="Probe">
       <a name="facing" val="west"/>
     </tool>
     <tool name="Tunnel">
-      <a name="labelfont" val="SansSerif bold 10"/>
+      <a name="labelfont" val="SansSerif bold 8"/>
     </tool>
     <tool name="Constant">
       <a name="width" val="32"/>
@@ -603,6 +602,7 @@ end TCL_Generic;
     <wire from="(1070,650)" to="(1090,650)"/>
     <wire from="(630,670)" to="(770,670)"/>
     <wire from="(880,270)" to="(880,320)"/>
+<<<<<<< HEAD
     <wire from="(1010,660)" to="(1090,660)"/>
     <comp lib="0" loc="(720,300)" name="Splitter">
       <a name="fanout" val="3"/>
@@ -611,6 +611,41 @@ end TCL_Generic;
       <a name="bit0" val="2"/>
       <a name="bit2" val="none"/>
       <a name="bit3" val="0"/>
+=======
+    <comp lib="0" loc="(900,150)" name="Tunnel">
+      <a name="facing" val="north"/>
+      <a name="width" val="12"/>
+      <a name="label" val="Operand2"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="1" loc="(820,310)" name="AND Gate">
+      <a name="size" val="30"/>
+      <a name="inputs" val="7"/>
+      <a name="negate0" val="true"/>
+      <a name="negate1" val="true"/>
+      <a name="negate4" val="true"/>
+      <a name="negate5" val="true"/>
+      <a name="negate6" val="true"/>
+    </comp>
+    <comp lib="0" loc="(720,300)" name="Tunnel">
+      <a name="facing" val="east"/>
+      <a name="width" val="4"/>
+      <a name="label" val="OpCode"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="0" loc="(420,90)" name="Pin">
+      <a name="facing" val="south"/>
+      <a name="output" val="true"/>
+      <a name="label" val="S"/>
+      <a name="labelloc" val="north"/>
+    </comp>
+    <comp lib="0" loc="(470,90)" name="Pin">
+      <a name="facing" val="south"/>
+      <a name="output" val="true"/>
+      <a name="width" val="6"/>
+      <a name="label" val="Op6"/>
+      <a name="labelloc" val="north"/>
+>>>>>>> parent of 5f622e4... myar
     </comp>
     <comp lib="0" loc="(370,140)" name="Tunnel">
       <a name="facing" val="north"/>
@@ -623,16 +658,99 @@ end TCL_Generic;
       <a name="label" val="Format"/>
       <a name="labelfont" val="SansSerif bold 12"/>
     </comp>
+<<<<<<< HEAD
+    <comp lib="0" loc="(190,480)" name="Splitter">
+=======
+    <comp lib="1" loc="(1090,330)" name="OR Gate">
+      <a name="width" val="2"/>
+      <a name="size" val="30"/>
+    </comp>
+    <comp lib="0" loc="(770,500)" name="Splitter">
+>>>>>>> parent of 5f622e4... myar
+      <a name="facing" val="west"/>
+      <a name="fanout" val="4"/>
+      <a name="incoming" val="4"/>
+      <a name="appear" val="center"/>
+    </comp>
+<<<<<<< HEAD
+    <comp lib="1" loc="(1000,1050)" name="AND Gate">
+      <a name="width" val="4"/>
+      <a name="size" val="30"/>
+      <a name="labelfont" val="SansSerif bold 10"/>
+=======
+    <comp lib="1" loc="(750,520)" name="NOT Gate">
+      <a name="size" val="20"/>
+    </comp>
+    <comp lib="0" loc="(820,510)" name="Splitter">
+      <a name="facing" val="west"/>
+      <a name="fanout" val="4"/>
+      <a name="incoming" val="4"/>
+    </comp>
+    <comp lib="0" loc="(320,90)" name="Pin">
+      <a name="facing" val="south"/>
+      <a name="output" val="true"/>
+      <a name="label" val="I"/>
+      <a name="labelloc" val="north"/>
+    </comp>
+    <comp lib="0" loc="(740,50)" name="Tunnel">
+      <a name="facing" val="south"/>
+      <a name="width" val="2"/>
+      <a name="label" val="SOp"/>
+      <a name="labelfont" val="SansSerif bold 8"/>
+    </comp>
+    <comp lib="0" loc="(470,100)" name="Splitter">
+      <a name="facing" val="west"/>
+      <a name="fanout" val="3"/>
+      <a name="incoming" val="6"/>
+      <a name="bit2" val="1"/>
+      <a name="bit3" val="1"/>
+      <a name="bit4" val="1"/>
+      <a name="bit5" val="2"/>
+    </comp>
+    <comp lib="1" loc="(700,510)" name="NOT Gate">
+      <a name="size" val="20"/>
+    </comp>
     <comp lib="0" loc="(190,480)" name="Splitter">
       <a name="facing" val="west"/>
       <a name="fanout" val="4"/>
       <a name="incoming" val="4"/>
       <a name="appear" val="center"/>
     </comp>
-    <comp lib="1" loc="(1000,1050)" name="AND Gate">
+    <comp lib="0" loc="(600,90)" name="Pin">
+      <a name="facing" val="south"/>
+      <a name="output" val="true"/>
       <a name="width" val="4"/>
+      <a name="label" val="rD"/>
+      <a name="labelloc" val="north"/>
+    </comp>
+    <comp lib="1" loc="(880,440)" name="OR Gate">
       <a name="size" val="30"/>
-      <a name="labelfont" val="SansSerif bold 10"/>
+    </comp>
+    <comp lib="8" loc="(131,391)" name="Text">
+      <a name="text" val="rd"/>
+      <a name="font" val="SansSerif plain 12"/>
+    </comp>
+    <comp lib="0" loc="(150,240)" name="Splitter">
+      <a name="fanout" val="32"/>
+      <a name="incoming" val="32"/>
+      <a name="appear" val="right"/>
+    </comp>
+    <comp lib="0" loc="(970,140)" name="Splitter">
+      <a name="facing" val="north"/>
+      <a name="incoming" val="12"/>
+      <a name="appear" val="right"/>
+      <a name="bit1" val="0"/>
+      <a name="bit2" val="0"/>
+      <a name="bit3" val="0"/>
+      <a name="bit4" val="0"/>
+      <a name="bit5" val="0"/>
+      <a name="bit6" val="0"/>
+      <a name="bit7" val="0"/>
+      <a name="bit8" val="1"/>
+      <a name="bit9" val="1"/>
+      <a name="bit10" val="1"/>
+      <a name="bit11" val="1"/>
+>>>>>>> parent of 5f622e4... myar
     </comp>
     <comp lib="2" loc="(530,800)" name="Decoder">
       <a name="select" val="4"/>
@@ -648,6 +766,7 @@ end TCL_Generic;
       <a name="negate0" val="true"/>
       <a name="negate1" val="true"/>
     </comp>
+<<<<<<< HEAD
     <comp lib="0" loc="(1130,230)" name="Pin">
       <a name="facing" val="west"/>
       <a name="output" val="true"/>
@@ -843,6 +962,23 @@ end TCL_Generic;
     </comp>
     <comp lib="0" loc="(210,450)" name="Tunnel">
       <a name="label" val="SCF"/>
+=======
+    <comp lib="0" loc="(190,310)" name="Splitter">
+      <a name="facing" val="west"/>
+      <a name="fanout" val="12"/>
+      <a name="incoming" val="12"/>
+      <a name="appear" val="center"/>
+    </comp>
+    <comp lib="0" loc="(1130,440)" name="Pin">
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+      <a name="label" val="Shift"/>
+      <a name="labelloc" val="east"/>
+    </comp>
+    <comp lib="0" loc="(700,260)" name="Tunnel">
+      <a name="facing" val="east"/>
+      <a name="label" val="I"/>
+>>>>>>> parent of 5f622e4... myar
       <a name="labelfont" val="SansSerif bold 12"/>
     </comp>
     <comp lib="1" loc="(800,680)" name="OR Gate">
@@ -857,10 +993,36 @@ end TCL_Generic;
       <a name="inputs" val="3"/>
       <a name="negate0" val="true"/>
     </comp>
+<<<<<<< HEAD
     <comp lib="0" loc="(960,970)" name="Splitter">
       <a name="facing" val="west"/>
       <a name="fanout" val="4"/>
       <a name="incoming" val="4"/>
+=======
+    <comp lib="0" loc="(190,390)" name="Splitter">
+      <a name="facing" val="west"/>
+      <a name="fanout" val="4"/>
+      <a name="incoming" val="4"/>
+      <a name="appear" val="center"/>
+    </comp>
+    <comp lib="0" loc="(220,110)" name="Tunnel">
+      <a name="facing" val="north"/>
+      <a name="width" val="4"/>
+      <a name="label" val="Cond"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="0" loc="(710,430)" name="Tunnel">
+      <a name="facing" val="east"/>
+      <a name="label" val="I"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="0" loc="(760,90)" name="Pin">
+      <a name="facing" val="south"/>
+      <a name="output" val="true"/>
+      <a name="width" val="2"/>
+      <a name="label" val="ST"/>
+      <a name="labelloc" val="north"/>
+>>>>>>> parent of 5f622e4... myar
     </comp>
     <comp lib="1" loc="(830,420)" name="AND Gate">
       <a name="size" val="30"/>
@@ -911,8 +1073,23 @@ end TCL_Generic;
       <a name="label" val="rN"/>
       <a name="labelloc" val="north"/>
     </comp>
+<<<<<<< HEAD
     <comp lib="0" loc="(760,90)" name="Pin">
       <a name="facing" val="south"/>
+=======
+    <comp lib="0" loc="(120,240)" name="Pin">
+      <a name="width" val="32"/>
+      <a name="label" val="Inst"/>
+    </comp>
+    <comp lib="0" loc="(740,380)" name="Tunnel">
+      <a name="facing" val="east"/>
+      <a name="width" val="2"/>
+      <a name="label" val="Format"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="0" loc="(1130,330)" name="Pin">
+      <a name="facing" val="west"/>
+>>>>>>> parent of 5f622e4... myar
       <a name="output" val="true"/>
       <a name="width" val="2"/>
       <a name="label" val="ST"/>
@@ -960,17 +1137,64 @@ end TCL_Generic;
       <a name="label" val="Format"/>
       <a name="labelfont" val="SansSerif bold 12"/>
     </comp>
+<<<<<<< HEAD
     <comp lib="1" loc="(1000,600)" name="AND Gate">
+=======
+    <comp lib="8" loc="(117,549)" name="Text">
+      <a name="text" val="conditional"/>
+      <a name="font" val="SansSerif plain 12"/>
+    </comp>
+    <comp lib="0" loc="(420,140)" name="Tunnel">
+      <a name="facing" val="north"/>
+      <a name="label" val="SCF"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="0" loc="(210,450)" name="Tunnel">
+      <a name="label" val="SCF"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="0" loc="(210,390)" name="Tunnel">
+>>>>>>> parent of 5f622e4... myar
       <a name="width" val="4"/>
       <a name="size" val="30"/>
       <a name="labelfont" val="SansSerif bold 10"/>
     </comp>
+<<<<<<< HEAD
     <comp lib="0" loc="(960,790)" name="Splitter">
+=======
+    <comp lib="8" loc="(109,455)" name="Text">
+      <a name="text" val="set cond flags"/>
+      <a name="font" val="SansSerif plain 12"/>
+    </comp>
+    <comp lib="0" loc="(190,430)" name="Splitter">
+>>>>>>> parent of 5f622e4... myar
       <a name="facing" val="west"/>
       <a name="fanout" val="4"/>
       <a name="incoming" val="4"/>
     </comp>
+<<<<<<< HEAD
     <comp lib="0" loc="(900,150)" name="Tunnel">
+=======
+    <comp lib="0" loc="(900,90)" name="Pin">
+      <a name="facing" val="south"/>
+      <a name="output" val="true"/>
+      <a name="width" val="12"/>
+      <a name="label" val="Off"/>
+      <a name="labelloc" val="north"/>
+    </comp>
+    <comp lib="0" loc="(630,710)" name="Tunnel">
+      <a name="facing" val="east"/>
+      <a name="width" val="4"/>
+      <a name="label" val="OpCode"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="0" loc="(210,310)" name="Tunnel">
+      <a name="width" val="12"/>
+      <a name="label" val="Operand2"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="0" loc="(600,100)" name="Tunnel">
+>>>>>>> parent of 5f622e4... myar
       <a name="facing" val="north"/>
       <a name="width" val="12"/>
       <a name="label" val="Operand2"/>
@@ -984,10 +1208,49 @@ end TCL_Generic;
     </comp>
     <comp lib="1" loc="(1000,780)" name="AND Gate">
       <a name="width" val="4"/>
+<<<<<<< HEAD
       <a name="size" val="30"/>
       <a name="labelfont" val="SansSerif bold 10"/>
     </comp>
     <comp lib="0" loc="(190,310)" name="Splitter">
+=======
+      <a name="label" val="Cond"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="1" loc="(870,270)" name="AND Gate">
+      <a name="size" val="30"/>
+      <a name="negate1" val="true"/>
+    </comp>
+    <comp lib="0" loc="(710,90)" name="Pin">
+      <a name="facing" val="south"/>
+      <a name="output" val="true"/>
+      <a name="width" val="5"/>
+      <a name="label" val="SIm"/>
+      <a name="labelloc" val="north"/>
+    </comp>
+    <comp lib="1" loc="(820,250)" name="AND Gate">
+      <a name="size" val="30"/>
+      <a name="inputs" val="3"/>
+      <a name="negate0" val="true"/>
+      <a name="negate1" val="true"/>
+    </comp>
+    <comp lib="8" loc="(132,429)" name="Text">
+      <a name="text" val="rn"/>
+      <a name="font" val="SansSerif plain 12"/>
+    </comp>
+    <comp lib="0" loc="(970,40)" name="Pin">
+      <a name="facing" val="south"/>
+      <a name="output" val="true"/>
+      <a name="width" val="5"/>
+      <a name="label" val="RtIm"/>
+      <a name="labelloc" val="north"/>
+    </comp>
+    <comp lib="8" loc="(117,501)" name="Text">
+      <a name="text" val="immediate"/>
+      <a name="font" val="SansSerif plain 12"/>
+    </comp>
+    <comp lib="0" loc="(190,550)" name="Splitter">
+>>>>>>> parent of 5f622e4... myar
       <a name="facing" val="west"/>
       <a name="fanout" val="12"/>
       <a name="incoming" val="12"/>
@@ -996,8 +1259,17 @@ end TCL_Generic;
     <comp lib="1" loc="(940,1010)" name="NOT Gate">
       <a name="size" val="20"/>
     </comp>
+<<<<<<< HEAD
     <comp lib="0" loc="(1040,1560)" name="Pin">
       <a name="facing" val="west"/>
+=======
+    <comp lib="8" loc="(116,313)" name="Text">
+      <a name="text" val="operand 2"/>
+      <a name="font" val="SansSerif plain 12"/>
+    </comp>
+    <comp lib="0" loc="(530,90)" name="Pin">
+      <a name="facing" val="south"/>
+>>>>>>> parent of 5f622e4... myar
       <a name="output" val="true"/>
       <a name="label" val="MOVN"/>
       <a name="labelloc" val="east"/>
@@ -1048,6 +1320,7 @@ end TCL_Generic;
       <a name="bit3" val="0"/>
       <a name="bit4" val="0"/>
     </comp>
+<<<<<<< HEAD
     <comp lib="0" loc="(970,100)" name="Tunnel">
       <a name="label" val="I"/>
       <a name="labelfont" val="SansSerif bold 12"/>
@@ -1057,10 +1330,25 @@ end TCL_Generic;
       <a name="output" val="true"/>
       <a name="label" val="RSB"/>
       <a name="labelloc" val="east"/>
+=======
+    <comp lib="0" loc="(210,420)" name="Tunnel">
+      <a name="width" val="4"/>
+      <a name="label" val="InputReg"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="0" loc="(970,50)" name="Splitter">
+      <a name="facing" val="south"/>
+      <a name="incoming" val="5"/>
+      <a name="appear" val="right"/>
+      <a name="bit2" val="1"/>
+      <a name="bit3" val="1"/>
+      <a name="bit4" val="1"/>
+>>>>>>> parent of 5f622e4... myar
     </comp>
     <comp lib="1" loc="(940,920)" name="NOT Gate">
       <a name="size" val="20"/>
     </comp>
+<<<<<<< HEAD
     <comp lib="0" loc="(1040,1500)" name="Pin">
       <a name="facing" val="west"/>
       <a name="output" val="true"/>
@@ -1092,6 +1380,10 @@ end TCL_Generic;
       <a name="width" val="4"/>
       <a name="label" val="Cond"/>
       <a name="labelloc" val="north"/>
+=======
+    <comp lib="1" loc="(730,560)" name="OR Gate">
+      <a name="size" val="30"/>
+>>>>>>> parent of 5f622e4... myar
     </comp>
     <comp lib="0" loc="(650,90)" name="Pin">
       <a name="facing" val="south"/>
@@ -1120,6 +1412,7 @@ end TCL_Generic;
       <a name="label" val="OpCode"/>
       <a name="labelfont" val="SansSerif bold 12"/>
     </comp>
+<<<<<<< HEAD
     <comp lib="1" loc="(1000,690)" name="AND Gate">
       <a name="width" val="4"/>
       <a name="size" val="30"/>
@@ -1140,6 +1433,64 @@ end TCL_Generic;
       <a name="size" val="30"/>
     </comp>
     <comp lib="0" loc="(710,90)" name="Pin">
+=======
+    <comp lib="8" loc="(123,525)" name="Text">
+      <a name="text" val="format"/>
+      <a name="font" val="SansSerif plain 12"/>
+    </comp>
+    <comp lib="0" loc="(720,1010)" name="Pin">
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+      <a name="label" val="RSB"/>
+      <a name="labelloc" val="east"/>
+    </comp>
+    <comp lib="1" loc="(800,550)" name="NOT Gate">
+      <a name="size" val="20"/>
+    </comp>
+    <comp lib="0" loc="(790,90)" name="Pin">
+      <a name="facing" val="south"/>
+      <a name="output" val="true"/>
+      <a name="label" val="SI"/>
+      <a name="labelloc" val="north"/>
+    </comp>
+    <comp lib="0" loc="(970,100)" name="Tunnel">
+      <a name="label" val="I"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="0" loc="(370,90)" name="Pin">
+      <a name="facing" val="south"/>
+      <a name="output" val="true"/>
+      <a name="width" val="4"/>
+      <a name="label" val="Op4"/>
+      <a name="labelloc" val="north"/>
+    </comp>
+    <comp lib="0" loc="(710,340)" name="Tunnel">
+      <a name="facing" val="east"/>
+      <a name="label" val="SCF"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="0" loc="(280,110)" name="Tunnel">
+      <a name="facing" val="north"/>
+      <a name="width" val="2"/>
+      <a name="label" val="Format"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="0" loc="(210,500)" name="Tunnel">
+      <a name="label" val="I"/>
+      <a name="labelfont" val="SansSerif bold 12"/>
+    </comp>
+    <comp lib="0" loc="(950,310)" name="Splitter">
+      <a name="facing" val="west"/>
+    </comp>
+    <comp lib="0" loc="(190,520)" name="Splitter">
+      <a name="facing" val="west"/>
+      <a name="appear" val="center"/>
+    </comp>
+    <comp lib="1" loc="(700,500)" name="NOT Gate">
+      <a name="size" val="20"/>
+    </comp>
+    <comp lib="0" loc="(830,90)" name="Pin">
+>>>>>>> parent of 5f622e4... myar
       <a name="facing" val="south"/>
       <a name="output" val="true"/>
       <a name="width" val="5"/>
@@ -1150,12 +1501,26 @@ end TCL_Generic;
       <a name="size" val="30"/>
       <a name="inputs" val="4"/>
     </comp>
+<<<<<<< HEAD
     <comp lib="0" loc="(210,420)" name="Tunnel">
       <a name="width" val="4"/>
       <a name="label" val="InputReg"/>
       <a name="labelfont" val="SansSerif bold 12"/>
     </comp>
     <comp lib="0" loc="(1040,1410)" name="Pin">
+=======
+    <comp lib="0" loc="(940,390)" name="Bit Extender">
+      <a name="in_width" val="1"/>
+      <a name="out_width" val="2"/>
+    </comp>
+    <comp lib="0" loc="(940,350)" name="Tunnel">
+      <a name="facing" val="east"/>
+      <a name="width" val="2"/>
+      <a name="label" val="SOp"/>
+      <a name="labelfont" val="SansSerif bold 8"/>
+    </comp>
+    <comp lib="0" loc="(1240,620)" name="Pin">
+>>>>>>> parent of 5f622e4... myar
       <a name="facing" val="west"/>
       <a name="output" val="true"/>
       <a name="label" val="Carry"/>
