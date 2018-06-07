@@ -1,8 +1,8 @@
 {\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf200
-{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\margl1440\margr1440\vieww28600\viewh17520\viewkind0
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\froman\fcharset0 Times-Roman;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+\margl1440\margr1440\vieww28600\viewh18000\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \f0\fs24 \cf0 ## Instructions we will implement Fully ##\
@@ -17,8 +17,7 @@
 ADD(s)				Add						xxxx 00 x 0100  x\
 ADC(s)				Add with Carry				xxxx 00 x 0101 x\
 AND(s)				And						xxxx 00 x 0000 x\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
-\cf0 SUB(s)				Subtract					xxxx 00 x 0010 x\
+SUB(s)				Subtract					xxxx 00 x 0010 x\
 RSB(s)				Reverse Subtract Byte			xxxx 00 x 0011 x\
 SBC(s)				Subtract with Carry				xxxx 00 x 0110 x\
 RSC(s)				Reverse Subtract with Carry		xxxx 00 x 0111 x\
@@ -28,9 +27,8 @@ MVN(s)				Move Not					xxxx 00 x 1111 x\
 ORR(s)				Or						xxxx 00 x 1100 x\
 EOR(s)				Exclusive Or					xxxx 00 x 0001 x\
 \
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b \cf0 Comparisons:
+\b Comparisons:
 \b0 \
 CMN(s)				Compare Not					xxxx 00 x 1011 x\
 CMP(s)				Compare					xxxx 00 x 1010 x\
@@ -43,12 +41,14 @@ TST(s)				Test						xxxx 00 x 1000 x\
 ASR					Arithmetic Right Shift			xxxx 00 x xxxx x xxxx xxxx - xxxx x 10 i xxxx \
 LSL					Logical Shift Left				xxxx 00 x xxxx x xxxx xxxx - xxxx x 00 i xxxx\
 LSR					Logical Shift Right				xxxx 00 x xxxx x xxxx xxxx - xxxx x 01 i xxxx\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
-\cf0 \
+\
 
 \b Branches:
 \b0 \
-B					Branch\
+B					Branch					
+\f1 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 cond 1 0 1 L signed_immed_24
+\f0 \cf0 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 \
 BL					Branch with Link\
 BX					Branch Exchange\
 BLX					Branch with Link Exchange\
@@ -61,20 +61,18 @@ BLX					Branch with Link Exchange\
 LDR					Load Register\
 LDRB					Load Register Byte\
 LDRSB				Load Register Signed Byte\
-STR					Store\
+STR					Store		\
 STRB					Store Byte\
 \
 
 \b General:\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b0 \cf0 NOP					No Operation\
+\b0 NOP					No Operation\
 CLZ					Count Leading Zeros\
 RBIT					Reverse Bits\
 REV					Reverse			\
 \
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
-\cf0 \
+\
 
 \b Extra Credit:
 \b0 \
