@@ -262,6 +262,7 @@ end TCL_Generic;
       <a name="label" val="Ex"/>
       <a name="labelfont" val="SansSerif bold 10"/>
     </comp>
+    <comp loc="(1170,390)" name="Execute"/>
     <comp lib="1" loc="(410,60)" name="NAND Gate">
       <a name="facing" val="west"/>
       <a name="size" val="30"/>
@@ -5349,6 +5350,18 @@ end TCL_Generic;
     <comp lib="0" loc="(140,710)" name="Pin">
       <a name="width" val="4"/>
       <a name="label" val="Rd"/>
+    </comp>
+  </circuit>
+  <circuit name="ShiftHandler">
+    <a name="circuit" val="ShiftHandler"/>
+    <a name="clabel" val=""/>
+    <a name="clabelup" val="east"/>
+    <a name="clabelfont" val="SansSerif bold 16"/>
+    <a name="circuitnamedbox" val="true"/>
+    <a name="circuitvhdlpath" val=""/>
+    <comp lib="0" loc="(140,280)" name="Pin">
+      <a name="width" val="32"/>
+      <a name="label" val="M"/>
     </comp>
   </circuit>
   <circuit name="ALU">
