@@ -1,0 +1,26 @@
+@ This is a testing suite for a pseudo ARMv7 cpu made using logisim @
+BLXS v4
+BLX a1
+MVN a1, a3, #&26d
+MVNS v3, v6, a3, ROR v3
+ANDS v6, a3, #&343
+BXS #&67cea8
+ADDS v8, v1, #&011
+BX #&5e0cef
+LDRSB v1, [v4, v1, LSL #&011]
+TSTS v8, v5, #&3d7
+RSBS v3, v6, #&376
+LDRSBMIS v4, [v3]
+ORR v1, v4, #&35e
+BVSS #&d80fae
+LDRS a1, [a1]
+SUBPLS a4, v2, #&054
+TEQGES v8, a2, #&28f
+EOR v3, v6, v4, LSR #&0a
+STRB v1, [v4, v7]
+LDRVS v5, [v1, #&032]
+BGTS #&541869
+LDRSB v8, [v8]
+CMPVS v8, v7, v1, LSR #&00
+BXAL #&d6d650
+B #&4b7b6b
