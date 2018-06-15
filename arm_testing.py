@@ -10,12 +10,13 @@ hex = True # if hex == true then insert '&' in front of every immediate
 neg = False # if neg == false then remove all - signs
 addr = False # if addr == false then no prepost addressing
 branch = False
+byte = False
 
 tests = open("TestARM.txt", 'w')
 tests.write("@ This is a variable testing suite for a pseudo ARMv7 cpu made using logisim @\n")
 if branch == False:
     tests.write("@ No Branch instructions @\n")
-tests.write("@ by Pablo and Akhil @\n")
+tests.write("@ by Pablo and Akhil @\n\n")
 
 DataProcessing = {
     0: "AND", 1: "EOR", 2: "SUB", 3: "RSB", 4: "ADD", 5: "ADC", 6: "SBC", 7: "RSC",
@@ -27,7 +28,7 @@ Shifts = {
 }
 
 DataTransfer = {
-    0: "LDR", 2: "LDRB", 2: "LDRSB", 3: "STR", 4: "STRB"
+    0: "LDR", 2: "LDRB", 3: "LDRSB", 1: "STR", 4: "STRB"
 }
 
 Branches = {
@@ -60,7 +61,9 @@ def buildProcessing():
 
 def buildTransfer():
     # instruction = "Not implemented yet"
-    instruction = DataTransfer.get(random.randint(0,4))
+    instruction = DataTransfer.get(random.randint(0,1))
+    if byte == True:
+        instruction = DataTransfer.get(random.randint(0,4))
     if (random.randint(0,2) == 0):
         instruction += Conditionals.get(random.randint(0,14))
     instruction += "S " if (random.randint(0,1) > 0) else " "
@@ -230,7 +233,8 @@ def printInstruction(n):
 # Scripts
 number_of_instructions = raw_input("How many Instructions would you like? ")
 tests.write("@ Here are: " + str(number_of_instructions) + " randomly generated tests @\n")
-printInstruction(number_of_instructions)
+printInstruction(int(number_of_instructions))
+print "Check TestARM.txt for your newly generated tests!"
 
 
 tests.close()
