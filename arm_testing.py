@@ -27,7 +27,7 @@ Shifts = {
 }
 
 DataTransfer = {
-    0: "LDR", 1: "LDRB", 2: "LDRSB", 3: "STR", 4: "STRB"
+    0: "LDR", 2: "LDRB", 2: "LDRSB", 3: "STR", 4: "STRB"
 }
 
 Branches = {
@@ -228,9 +228,9 @@ def printInstruction(n):
 
 
 # Scripts
-number_of_instructions = raw_input("How many Instructions would you like? :)")
-tests.write("@ Here are: " + str(number_of_instructions) + " randomly generated tests @")
-printInstruction(num_of_instructions)
+number_of_instructions = raw_input("How many Instructions would you like? ")
+tests.write("@ Here are: " + str(number_of_instructions) + " randomly generated tests @\n")
+printInstruction(number_of_instructions)
 
 
 tests.close()
