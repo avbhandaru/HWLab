@@ -2,5 +2,424 @@
 @ No Branch instructions @
 @ by Pablo and Akhil @
 
-@ Here are: 1 randomly generated tests @
-STRS v7, [v8]
+@ Here are: 420 randomly generated tests @
+LDR v2, [a1]
+SBCS a3, v1, #&347
+LDRHIS v3, [a1, #&06d]
+STRGES a4, [v8]
+LDRHSS v4, [v7, #&051]
+TSTS v2, a2, #&29e
+LDR a4, [a4]
+CMP v2, v3, a2, ASR #&18
+EORS a4, a3, #&1ff
+CMN v4, v3, #&183
+ADCLOS v5, v7, v6, LSL #&00
+LDRLT v5, [v1, #&045]
+STRS v6, [a2]
+STRVC a4, [v7, #&64]
+SBCS a2, a3, v6, LSR v8
+RSBS a1, v1, v3
+LDRS a3, [v3, #&006]
+MVN a2, v2, a2, ASR v4
+ADD a1, a1, v5, ROR #&1c
+ADDAL v2, v8, #&2a5
+STR a4, [v3, a4]
+ADCS v4, v3, #&105
+ADD v4, v7, v4
+ORRLT v3, v3, v5, LSR v5
+STRLS v6, [a1, v4, LSL #&006]
+LDRS a3, [v6, #&59]
+STR a3, [v5, #&4e]
+MOV v7, v6, v1, ASR v6
+STR v1, [a4]
+LDRS a4, [a2, v8, ROR #&005]
+STRS v1, [v5, #&040]
+STRS v6, [v1]
+STRS v3, [v5, #&076]
+ADCS a2, v5, #&5d
+BICS a1, v6, a4, ROR #&06
+LDRLT v7, [a4]
+SBCS v7, a3, a3, ASR a1
+LDRPL v1, [v1, #&05b]
+ADDMI v5, a2, v2, ASR v5
+LDR a3, [v8, #&068]
+SBCNES v5, v8, v8, LSR v1
+LDRS v2, [a4]
+RSBS a4, v3, #&1c6
+LDR v7, [v2, #&04f]
+STR v3, [v2, #&09]
+BIC v4, v2, v2, ROR #&10
+LDR v4, [v4, v6]
+LDR a3, [a1, #&5b]
+LDRS a1, [v2, #&072]
+MOVS a4, v6, #&165
+BICS v1, v7, #&27a
+LDRS a4, [v4, #&004]
+SUBS v8, v2, a2, ASR a4
+AND v7, v5, a1, LSR #&13
+MOVVC v8, v4, #&25e
+STRPL v4, [v4, #&6b]
+LDRS v2, [a4]
+LDR v1, [v3, #&020]
+STRVSS v8, [a2, #&04a]
+STREQS v8, [v7, #&10]
+STR v5, [v5]
+SBCLOS v8, v7, #&04b
+STR a2, [v7, v8, ASR #&007]
+ANDGES a1, v7, a1, ROR #&0c
+TSTGES a2, v5, a4, LSR v5
+STR v4, [v1, a3, LSR #&012]
+CMPMI v4, a1, #&55
+ORR v8, v7, #&36
+STRHI a4, [v1, #&58]
+STR v5, [v5, #&03c]
+STRLTS v7, [v8, #&063]
+SBC a3, a4, v6, LSR a3
+STRS a1, [a4]
+TSTPLS v8, v7, #&382
+SUBAL v4, v4, a1, LSR v1
+ORR v4, v6, #&bd
+LDRGES v2, [v3, v3, LSR #&00c]
+STR v8, [a4, v8, ROR #&007]
+STR v2, [v2, v8, LSL #&01a]
+STRLOS a2, [a3]
+TEQS v5, a1, v1, LSR v3
+RSBNES a3, v2, #&1eb
+TSTMI a4, v2, #&2cc
+AND v2, v2, a1, ASR v1
+STR v3, [v2, a3, ROR #&00c]
+STRALS a2, [v5, #&1e]
+EOR v7, a3, #&2c3
+LDR v6, [v1, a4, ROR #&015]
+MVNS v3, a3, #&251
+ANDLT a3, a4, v4, LSR v1
+MVNVSS a1, a3, v1
+SUBLE a2, v4, v7, LSL v2
+STR v1, [a3, v1]
+LDRS a3, [v4, #&066]
+LDR a2, [v1, v6, ROR #&01c]
+ORRS v7, v2, #&18d
+CMNS v7, v5, v4, LSR a2
+LDRS a3, [v1, #&21]
+STRS v5, [a2, #&026]
+CMNLO v5, a2, #&054
+STRLE a2, [a3]
+ADCS v7, a1, #&7d
+BICS a1, a4, a3, ASR #&1e
+BIC a3, v8, #&3f9
+ORRLTS v5, v7, #&2a8
+ADC v8, a1, v7, ROR #&17
+STR a4, [v3, v8, LSR #&01a]
+CMNHIS v3, v6, #&21d
+STR v2, [a2, v6, LSR #&01d]
+CMPS v7, a2, #&1aa
+STR a2, [v6]
+STRLOS v2, [v4, #&27]
+LDRS v3, [a3, #&5a]
+SUBLS v7, v4, #&051
+EORLOS v1, a1, #&0c3
+SBCS a3, v6, #&031
+RSCHS a2, v4, #&308
+CMNS v7, v7, v7, LSL #&0b
+MOV v5, a2, #&27f
+LDRAL a4, [a4, a2, ROR #&003]
+LDR v1, [v1]
+LDRHS v6, [v7, #&6c]
+STRLT a4, [a4, a2, ASR #&016]
+ORRLES v7, v8, #&3c5
+ORRS a2, a1, v7, LSL a4
+RSC v5, v7, v6, ASR #&09
+STRS v1, [a2, a1, LSL #&012]
+LDRS a4, [v4]
+RSC v8, a2, v8, ROR #&07
+LDR a4, [a3, #&021]
+MVNLES a1, a1, #&216
+LDR v3, [v4, #&03f]
+STR v8, [v3, #&007]
+TST a1, a1, v2, ASR v3
+SBCS v1, v8, a3, ASR a4
+RSBLO a2, v6, v4, LSL #&0d
+LDR v4, [v7, v8, LSR #&01a]
+CMP a3, a2, v5, ROR v5
+CMP a4, v7, a4, LSL v2
+STRLES a1, [v7]
+STRS v6, [v6]
+EOR v2, v8, #&c8
+MOV v4, a2, #&353
+LDR v3, [v6, #&03a]
+CMPEQS a3, v7, #&69
+STR v6, [a1, v1, ROR #&007]
+RSCLO v6, v8, #&349
+STRHS a2, [a2, #&076]
+LDR a2, [a3, #&10]
+STRLO a4, [v5, #&50]
+CMNS v7, v4, #&2cf
+STR a3, [v6, #&16]
+STR a4, [v7]
+EORVS a4, v6, #&1ce
+CMN v8, a3, v7, ASR v7
+EOR v8, v5, v4, LSL #&0a
+CMN a4, a1, v4, ROR #&1c
+LDR v8, [v8, v8, ASR #&018]
+EOR v1, v6, #&38f
+LDRS a3, [a3, #&052]
+LDR a2, [v8, #&80]
+CMP a1, v7, #&371
+LDRVC a4, [a1, a2]
+ADDLOS a4, v7, a2, LSR a4
+MVN a2, v3, v2, LSR #&1d
+CMN v1, v1, a1, LSL v5
+CMP v5, a1, v4, ASR a2
+LDRS v1, [a4, #&51]
+CMPS v7, v8, v7, ROR #&05
+ANDHIS v6, v2, v2, LSR a3
+ADDS a1, a3, v8, ASR v4
+STRS v4, [a1, a3, LSL #&014]
+RSBEQ v4, v1, #&22b
+STR v4, [v3]
+LDRS a4, [a2, v7, ASR #&01a]
+LDRS a3, [v6, v6]
+LDRLTS a4, [v3, a1]
+LDRS v6, [a4, a3, ROR #&017]
+RSC v7, a2, v6, LSR v6
+CMP a3, v2, v5, LSR a4
+LDR v7, [v1, a4, ROR #&00b]
+STRNES a3, [v1]
+TEQEQ v5, a1, a2, LSL #&1b
+ORRS v8, v2, v5, LSL v2
+STR v4, [v1, #&08]
+CMNS v4, v4, a2
+BIC v8, v2, v2
+RSCS a1, a3, #&20b
+RSCLT v3, v3, a2, ROR v5
+STRS v2, [v4, #&7e]
+SBC v8, v3, #&191
+STR v6, [a2, v5, ASR #&01e]
+LDRS v1, [v5, #&06c]
+LDR a3, [v2, a4]
+LDR v5, [v6, #&68]
+CMN v1, a2, v4, LSR a3
+STRNE v3, [v6, #&06]
+TSTHSS v5, v3, v4, ASR #&1d
+STR v1, [v5, v2, ASR #&00a]
+STR a1, [a3, #&7f]
+MVN v4, v8, v3, ASR #&1d
+SBC v2, v7, v5, LSL #&1b
+STRMI v6, [v6, #&010]
+LDRS v2, [a3, #&056]
+STR v6, [a3, a1]
+LDR v5, [v3, #&0d]
+ORR v4, v2, a1, ROR a3
+SBCGE v1, a3, #&2b4
+LDRS v3, [a4, #&5c]
+CMP v7, v6, v8, LSL v7
+STR a3, [a1, a2, LSR #&018]
+STRALS a4, [a1, v4, LSR #&017]
+MOVS v5, a1, #&235
+LDRS v7, [v2, a2, LSR #&01d]
+CMPAL a1, a3, #&a0
+RSCS a4, v6, #&155
+LDRLSS v3, [v2]
+STRLES a2, [v3, #&71]
+RSB v3, v7, a2
+LDR v8, [v8]
+MVNS v4, v8, v5, LSL #&1b
+CMPPLS v1, v6, v2, LSL a4
+STRGES a3, [v7, #&2f]
+ADDS a2, v5, v1
+LDRS a3, [v6, #&059]
+LDRS v2, [v4, v6]
+STRVS v2, [v5, #&75]
+LDR v3, [v5]
+SUB v7, a1, a4, ROR a2
+BICGE a1, v3, #&2db
+EOR v3, a4, #&2c5
+EORS v8, v5, #&37
+TEQ v7, v2, v8, LSR v3
+STR v5, [v6, v6]
+LDRHS v2, [v6, #&07]
+TEQS a1, v6, a2, LSR a2
+SBCS a2, v3, #&2cb
+ADCALS v8, a3, #&151
+STRPL a1, [v1]
+LDRHI a3, [a2, a1]
+STR v2, [v6, a3]
+ORRS v2, a3, #&326
+CMPS v7, a2, #&28
+STRS v2, [a1, #&65]
+STR v2, [v4, v7, ASR #&015]
+LDRS a4, [v3, #&012]
+LDRS a3, [v8]
+RSCS v6, v1, #&385
+RSBLTS v8, a3, a1, ASR #&17
+RSBS v3, v8, #&a4
+SBCS v5, v1, v2, ASR #&0c
+LDRLE v6, [v7, v2, ASR #&01b]
+LDRS v8, [a1]
+ADCLSS v7, v6, #&256
+STRS a4, [v1, a1]
+LDR a4, [a3, #&03d]
+MOV v7, a1, v1, LSR #&1d
+LDR v8, [v5, #&5e]
+STRS v1, [v1, #&39]
+CMP a2, a2, a2, LSR #&0c
+STRLS v6, [v7, #&76]
+STR v4, [v3]
+LDRVC a2, [v8, a2]
+LDR a3, [v1, #&051]
+CMN v8, v1, v4, ASR a2
+LDRVS v8, [v1, #&2e]
+STRS a1, [v8, #&03]
+LDR v7, [a4]
+LDRVS v8, [v4, v4, LSR #&006]
+LDRLTS v2, [v6, v7, ROR #&013]
+ORRS a1, a1, v2, ASR v5
+RSBGE v8, v8, #&074
+BICS a2, a4, #&162
+STRS a4, [v1, v8, LSR #&019]
+ADDPLS v6, a2, v8, ROR v4
+STRALS v8, [a3, #&75]
+STR v5, [a4, #&1b]
+TSTS a1, v4, #&2d4
+STR v3, [v8, #&76]
+STR v7, [v2, #&05e]
+STRS a2, [v6, #&3a]
+LDR a1, [a3, v3, LSR #&013]
+CMNS v3, v8, #&24e
+AND a1, v6, v7, ROR a3
+STRHIS v7, [a1, #&20]
+STRHSS v3, [v4]
+ADDLSS v6, v7, a2, ROR #&00
+STRS a3, [v3]
+ADDHSS v8, a3, v7, LSR v3
+CMPS v4, v5, #&22f
+STRS v4, [v4, a2]
+STR a3, [v2]
+EORHIS v2, v7, #&2a9
+LDRS v4, [v1]
+CMNLES v7, v8, a3, ROR #&02
+MVNGE v2, v3, a1, LSR a2
+MVNHS a4, v1, #&a8
+RSC a4, a3, v3, LSR v4
+TEQ a2, a1, v5, LSL a4
+CMPLTS v5, v2, #&2b6
+LDR v8, [a3]
+STRPL v2, [v3, #&46]
+STR a2, [v1, #&7d]
+LDR a3, [a1, #&3f]
+STR a4, [a1]
+CMNLOS v3, a3, #&48
+ADD v4, v7, #&c9
+LDRVC a1, [a1, #&07e]
+TEQ v6, a3, #&298
+STRS v2, [a4, v1, LSL #&009]
+CMPS v2, v3, #&033
+STRLT v8, [v1]
+AND v4, v6, #&3a3
+STRGE v3, [v2, #&4b]
+STR v8, [a4, #&013]
+AND v1, a4, a2
+LDRS a3, [v4, #&80]
+STR v7, [a3, #&6d]
+STR v6, [v3, #&04d]
+STRS a3, [v8]
+ADC v4, v3, v1, ROR v7
+MOV v1, v7, #&93
+CMN v7, a3, v1, ASR v6
+STRS v7, [a4]
+SBCLS v6, v4, #&196
+LDRAL v7, [v8, v4, LSR #&01c]
+LDRS a1, [v4]
+LDRVCS a1, [v6, #&074]
+STR v5, [v2, #&7d]
+LDRLT v6, [v8, a4, LSR #&00b]
+ADDHI v8, v5, a1, LSR a4
+ADCS a4, v1, v8
+ORRLES v1, v2, v3, ROR v5
+BICS v8, v2, v4
+SBC a3, a1, #&113
+SBC a2, a3, #&245
+STRS a3, [a2, a1, ROR #&005]
+STRLOS a3, [v7, #&030]
+EORS v3, v7, v5, ROR a1
+LDRS v8, [v5, v8, ASR #&00b]
+STRS a3, [a1, #&015]
+LDRS v3, [a1, #&56]
+STRGE v8, [v3, v2, ASR #&01c]
+STRS a1, [a2, #&7e]
+STR v8, [a3, v6, ROR #&00c]
+LDR v8, [a3]
+STRS v1, [v5, v3]
+ADD v8, a2, #&3a
+MOVS v5, v4, a4, LSL #&10
+STRHSS a2, [v7, v5, LSL #&000]
+AND a2, a2, #&37b
+LDR v1, [a4, #&051]
+STRS a3, [v3, v4, ASR #&00d]
+TSTGTS a2, v6, v5, ASR v8
+ADD v3, a1, #&219
+LDRS v3, [v1, v5, LSL #&01a]
+TSTS v4, v3, v4, ASR v8
+ORRALS v5, v7, #&3cd
+LDR a3, [v7, a1]
+CMN a4, v7, v8, ASR v7
+LDRPLS v6, [v1, #&53]
+LDRGE v5, [v2, #&73]
+SUB a4, v1, v7, ROR #&02
+CMP v4, a4, a4, ASR v8
+SUB v3, v1, #&a4
+LDR v3, [v4, #&074]
+MOVLT v6, v3, v1, ROR #&17
+RSCS v8, v5, #&3cb
+LDRS v2, [a2, #&05b]
+MVNVS a1, a2, #&152
+SUB v2, v2, v7, LSR #&1d
+CMNS v3, v8, #&290
+ADC v7, v7, v2, ROR #&06
+LDRS a3, [v6, #&15]
+CMPLO v6, v5, #&322
+STRS v6, [v7, v6, LSR #&01f]
+LDR v4, [v4, #&54]
+LDR v6, [v1]
+STRALS v5, [v3]
+LDR a2, [v2, #&80]
+LDR a1, [v6, #&027]
+LDRAL a4, [a2, #&1b]
+LDRS v1, [v1, a2, ASR #&00a]
+TEQHI v3, v6, v1, ROR a2
+LDRHIS v6, [a1, #&0e]
+LDR a1, [a4, #&016]
+ANDLO v1, v2, #&3b5
+LDR a2, [v5, #&04e]
+ANDS v4, a2, #&1b1
+CMP a4, a2, #&88
+BICS v6, v4, v2, LSL v5
+TST v6, a3, v4, ASR #&01
+SBCS a1, v6, a3, ASR v2
+STRHIS v1, [v7, #&03a]
+RSBS v2, a4, #&385
+ADCLS v2, v3, v6, LSL v2
+CMNS v7, v1, v7, ROR v2
+LDR v4, [v2, v3]
+EORS a4, v1, #&2a8
+STRPLS v4, [v6]
+ADDS v8, v8, #&156
+AND v3, v4, v3, LSR #&0b
+LDRVCS v8, [v5, v6, LSL #&010]
+ADCS v1, v4, v7, ASR #&1a
+RSCS v4, a2, #&064
+TEQ v3, v7, #&1b0
+SBCLE v4, v7, a2, ROR v2
+ANDS a2, v3, #&3f9
+RSC a1, v1, #&33c
+LDRS a1, [a2, #&068]
+LDR v8, [v7, #&0d]
+STRLS a2, [a4, v4, LSR #&002]
+STRS v3, [a2, v1, LSL #&00f]
+LDR v5, [v5, #&042]
+SBC a2, a3, a3, LSR v6
+LDR v2, [v8]
+STR v3, [v5, #&031]
+MVNHS a2, a4, v1, ASR a4
+MVNLOS v4, a2, #&08e
+STR a1, [v6, #&074]
