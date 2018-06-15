@@ -16,6 +16,7 @@ def fetch(line):
 
 def decode(line):
     """  """
+    
 
 
 def execute(line):

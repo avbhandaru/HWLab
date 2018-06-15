@@ -1,26 +1,102 @@
 @ This is a testing suite for a pseudo ARMv7 cpu made using logisim @
-BLXS v4
-BLX a1
-MVN a1, a3, #&26d
-MVNS v3, v6, a3, ROR v3
-ANDS v6, a3, #&343
-BXS #&67cea8
-ADDS v8, v1, #&011
-BX #&5e0cef
-LDRSB v1, [v4, v1, LSL #&011]
-TSTS v8, v5, #&3d7
-RSBS v3, v6, #&376
-LDRSBMIS v4, [v3]
-ORR v1, v4, #&35e
-BVSS #&d80fae
-LDRS a1, [a1]
-SUBPLS a4, v2, #&054
-TEQGES v8, a2, #&28f
-EOR v3, v6, v4, LSR #&0a
-STRB v1, [v4, v7]
-LDRVS v5, [v1, #&032]
-BGTS #&541869
-LDRSB v8, [v8]
-CMPVS v8, v7, v1, LSR #&00
-BXAL #&d6d650
-B #&4b7b6b
+@ No Branch instructions @
+STRB v3, [v3]
+ANDS a3, a2, #&206
+STR v4, [v4, #&5c]
+AND v8, a4, #&15f
+MVNGT v4, v6, #&243
+LDRSBAL a3, [v3, v7]
+LDRSB v3, [v8, v2]
+ADDS v1, v2, v1
+RSCS v8, a4, v8, LSR #&1c
+ADCALS a2, v7, #&39d
+CMPLES v6, v1, #&341
+STRB v2, [a4, #&2e]
+ORRLES a4, v5, #&381
+CMNS v7, v3, #&030
+MVN a2, v1, v5, LSR #&06
+LDRMIS v5, [v3, #&76]
+LDRSBVS v8, [v8, #&058]
+MVNS v4, a1, #&08b
+EOR v6, v4, a4, LSL v3
+EOR v1, v2, v1, LSL v4
+CMPS a3, v1, v7, LSR a3
+RSBS v2, v2, #&0da
+EORALS v2, a2, v7, LSL a4
+MVNAL a2, v6, #&258
+SBCLTS a2, a1, v8, ROR #&1e
+LDRSBHI v8, [a2]
+EORS a2, a2, a4, LSL a4
+LDRBS v3, [v2, #&05c]
+LDRS v8, [v3, a2]
+LDREQS a1, [v1, a1, ASR #&010]
+LDRB a1, [a1, v7, ASR #&015]
+CMPS a3, v2, #&107
+STRBMI a4, [a4, #&20]
+STRBLO v6, [a1]
+ADD v3, a2, #&0b1
+LDR v7, [a4, #&053]
+LDRSBS v2, [a2]
+ADCHSS v6, v8, #&073
+STRBGE v3, [v6, v2, LSL #&015]
+LDRBNES a2, [v4, #&3f]
+ANDHI v8, v8, #&3de
+STRB a2, [a4, v2, ROR #&00c]
+MVN v2, v8, #&39d
+STRS v3, [a2, v8]
+SUB v3, v5, #&2a4
+BICEQ a1, a1, #&073
+LDRHIS a4, [a4, a1, LSL #&008]
+CMP a4, a2, v4, LSL v2
+LDRBS a1, [a3, #&052]
+LDRS v4, [v6, v5, ASR #&00a]
+STRS a3, [v7]
+LDRSBS v1, [a4, #&013]
+LDRBS v4, [v5, #&56]
+LDRSB a1, [v4, #&07a]
+RSC a1, v5, v8
+LDRSB v7, [a2]
+BICLS a4, a2, #&3dd
+LDRSBLT a1, [v2, v5, LSR #&01f]
+EOR a2, v7, #&1cf
+STRS v3, [v7, a1, ROR #&01d]
+EOREQ a3, a4, a4, ROR #&06
+STRBHIS v5, [v7]
+STRBLT a4, [a1, #&02e]
+ANDPL v5, a3, #&399
+TEQS v5, v4, #&23e
+LDRMI v1, [v6, #&30]
+MOV a1, v2, #&338
+TEQMI v7, v2, #&1b8
+LDRB v7, [a4]
+LDRS v3, [v7, v4, LSR #&000]
+ANDS a1, v6, #&3ff
+CMPAL v6, v6, v8, LSL #&0c
+TSTS v3, a2, v3, LSR v6
+TEQNES a1, v1, a2, ASR v1
+STRS v4, [a4, v7, ASR #&008]
+STRBS a2, [a2, #&036]
+STRS v1, [v8]
+ADDS v7, v5, #&d8
+LDRBMIS v4, [v3, #&038]
+TEQGE v6, v6, v1, LSR a1
+STRB v4, [a4, #&52]
+BICVC a3, v5, v3, ASR #&1a
+SBCGT v3, a1, v1, LSL a2
+STRS v8, [v8, v8, LSL #&019]
+LDRB v7, [v5, v2]
+ADDLTS a4, v5, a1, LSR v1
+LDRB v4, [a2, #&078]
+STRBHSS v5, [v4]
+LDRBS v8, [v4, #&05a]
+SBC v7, v8, v2, ROR v3
+MVNS v5, a3, v5
+STRHIS v6, [v6, #&55]
+LDRB v5, [a3, a1]
+LDRBLOS v3, [v4, a4, ROR #&019]
+CMP a1, v3, v4, LSR a3
+ANDS v6, v4, #&d7
+LDRSBS a1, [a4]
+CMNS v5, v2, v1, ROR #&09
+SUB a4, v4, v1, ROR v5
+TEQS a4, a2, a2, ASR #&10

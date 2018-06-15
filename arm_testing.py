@@ -9,9 +9,13 @@ import re
 hex = True # if hex == true then insert '&' in front of every immediate
 neg = False # if neg == false then remove all - signs
 addr = False # if addr == false then no prepost addressing
+branch = False
 
 tests = open("TestARM.txt", 'w')
-tests.write("@ This is a testing suite for a pseudo ARMv7 cpu made using logisim @\n")
+tests.write("@ This is a variable testing suite for a pseudo ARMv7 cpu made using logisim @\n")
+if branch == False:
+    tests.write("@ No Branch instructions @\n")
+tests.write("@ by Pablo and Akhil @\n")
 
 DataProcessing = {
     0: "AND", 1: "EOR", 2: "SUB", 3: "RSB", 4: "ADD", 5: "ADC", 6: "SBC", 7: "RSC",
@@ -79,7 +83,10 @@ def buildBranch():
     for instruction type. """
 def chooseBuild():
     # format = random.randint(0,1)
-    format = random.randint(0,2)
+    if branch == True:
+        format = random.randint(0,2)
+    else:
+        format = random.randint(0,1)
     # format = 2
     switcher = {
         0 : buildProcessing,
@@ -221,7 +228,10 @@ def printInstruction(n):
 
 
 # Scripts
-printInstruction(100)
+number_of_instructions = raw_input("How many Instructions would you like? :)")
+tests.write("@ Here are: " + str(number_of_instructions) + " randomly generated tests @")
+printInstruction(num_of_instructions)
+
 
 tests.close()
 
