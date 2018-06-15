@@ -1,34 +1,49 @@
+@@ Demonstration @@
+
 @ Moves
-mov a1, #&1
-mov a2, #&1
+mov a1, #&1 				@ Move: 1 -> a1
+mov a2, #&1 				@ Move: 1 -> a2
 
 @ Hazard testing
-adds a3, a1, a2, lsl #&5
-adds a4, a1, a3, lsr #&5
-adds v1, a4, a3, lsr #&5
-subs v2, a4, v1 
-rsb v3, v2, v1
+adds a3, a1, a2, lsl #&5		@ Add: 1 + (1 << 5) -> a3
+adds a4, a1, a3, lsr #&5		@ Add: 1 + (33 >>> 5) -> a4
+adds v1, a4, a3, lsr #&5		@ Add: 2 + (33 >>> 5) -> v1
+subs v2, a4, v1 			@ Sub: 2 - 3 -> v2
+rsb v3, v2, v1				@ Rsb: 3 - (-1) -> v3
 
 @ Loads and Stores with Hazards
-str a3, [v3, a4, lsl #&1]
-ldr v4, [a1, #&7]
-sub v4, v4, #&1 @ v4 = 33 - 1 
+str a3, [v3, a4, lsl #&1]		@ Str: 33 -> [4 + (2 << 1)]
+ldr v4, [a1, #&7]			@ Ldr: [1 + #7]* -> v4
+sub v4, v4, #&1 @ v4 = 33 - 1 		@ Sub: 33 - 1 -> v4
 
 @ Conditional Execution
-subeq v5, a3, a4
-subne v6, a3, a4
-cmp v6, v5
+subeq v5, a3, a4			@ Subeq: if (CPSR == eq) then 33 - 2 -> v5 else nothing
+subne v6, a3, a4			@ Subeq: if (CPSR == eq) then 33 - 2 -> v6 else nothing
+cmp v6, v5				@ Cmp: setCPSR(31 - 0) -> CPSR
 
 @ Branch
-b next
-add a1, a1, #&1
+b next					@ B: next (0x4c) -> pc
+add a1, a1, #&1				@ Add: (In Delay Slot) 1 + #1 -> a1
 @ fodder
-add a1, a1, #&1
-add a1, a1, #&1
-add a1, a1, #&1
-add a1, a1, #&1
-next
-sub a1, a1, #&2
+add a1, a1, #&1				@ No Execution
+add a1, a1, #&1				@ No Execution
+add a1, a1, #&1				@ No Execution
+add a1, a1, #&1				@ No Execution
+next:					@ Branch Here.
+sub a1, a1, #&2				@ Sub: 2 - 2 -> a1
+
+@ Registers after running Program
+@ a1 = 1
+@ a2 = 1
+@ a3 = 33
+@ a4 = 2
+@ v1 = 3
+@ v2 = -1
+@ v3 = 4
+@ v4 = 33 "->" 32
+@ v5 = 0
+@ v6 = 31
+@ CPSR = 0x0 "->" 0x80000000 "->" 0x0
 
 
 
