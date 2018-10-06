@@ -1,0 +1,82 @@
+# Text Backup Files #
+*.sw[a-z]
+*~
+\#*\#
+.\#*
+
+# OS X
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+
+# temporary files which can be created if a process still has a handle open of a deleted file
+.fuse_hidden*
+
+# KDE directory preferences
+.directory
+
+# Linux trash folder which might appear on any partition or disk
+.Trash-*
+
+# Java Files
+com/bfh
+com/cburch
+com/hepia
+*.jar
+*.class
+
+# Generated files
+javadoc/
+test/com/cburch/logisim/gui
+bin/
+package/Logisim-evolution.html
+package/Logisim-evolution.jnlp
+package/Logisim-evolution_browser.jnlp
+package/bundles/
+
+# additional libraries
+!libs/*.jar
+
+# IDE files
+.metadata/
+.settings/
+.project
+.classpath
+
+
+# Simulation files and folders
+resources/logisim/sim/comp.tcl
+resources/logisim/sim/transcript
+
+resources/logisim/sim/comp/
+resources/logisim/sim/src/
+publi/
+
+# File containing the log level
+logback.xml
